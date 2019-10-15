@@ -1,0 +1,7 @@
+# source project
+googletest
+
+# generated directories
+src
+tmp
+
