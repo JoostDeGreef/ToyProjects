@@ -5,7 +5,7 @@ cmake_minimum_required (VERSION 3.8)
 
 # Add source to this project's executable.
 add_library (GoogleTest 
-             "googletest/googletest/src/gtest.cc"
+             "src/gtest/gtest-all.cc"
              "src-extra/ConsoleOutput.cpp"
              "src-extra/ConsoleOutput.h"
              "src-extra/GoogleTestMain.cpp"

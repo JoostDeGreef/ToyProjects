@@ -1,12 +1,25 @@
 ﻿// MathCore.cpp : Defines the entry point for the application.
 //
 
+#include "gtest/gtest.h"
 #include "MathCore.h"
 
 using namespace std;
+using namespace testing;
 
-int main()
+class MathCoreTest : public Test
 {
-	cout << "Hello CMake." << endl;
-	return 0;
+protected:
+
+	virtual void SetUp()
+	{
+	}
+
+	virtual void TearDown()
+	{
+	}
+};
+
+TEST_F(MathCoreTest, Init)
+{
 }

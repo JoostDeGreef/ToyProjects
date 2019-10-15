@@ -8,13 +8,3 @@ get/download, configure, update, build etc.
 'update.sh' : script which will get all the sources and perform configuration.  
 'proper.sh' : remove all foreign/generated/compiled files.  
 
-Requirements
-
-git  
-curl  
-gcc/g++  
-tcl / tk  
-make  
-
-Remark: the update and proper scripts seem to work on the Windows 10 linux subsystem.
-
