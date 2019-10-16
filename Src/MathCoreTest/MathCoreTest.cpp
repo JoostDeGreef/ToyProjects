@@ -1,7 +1,4 @@
-﻿// MathCore.cpp : Defines the entry point for the application.
-//
-
-#include "gtest/gtest.h"
+﻿#include "gtest/gtest.h"
 #include "MathCore.h"
 
 using namespace std;

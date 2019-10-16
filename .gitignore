@@ -34,3 +34,4 @@
 /.vs
 /out
 
+/3rdParty/GoogleTest/src-extra/gtest-all.cc
