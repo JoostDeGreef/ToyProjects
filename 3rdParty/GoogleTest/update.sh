@@ -5,7 +5,7 @@ SRC=googletest
 PYTHON=`which python`
 if [ -z ${PYTHON} ];
 then
-  echo "Python should be accesible!"
+  echo "Python should be accesible as 'python'."
   exit 1
 fi
 
@@ -23,7 +23,15 @@ rm -rf src
 python ./googletest/googletest/scripts/fuse_gtest_files.py src 
 
 echo "Installing headers"
-rm -rf ../include/gtest
 mkdir -p ../include/gtest
-cp src/gtest/gtest.h ../include/gtest
+diff -q src/gtest/gtest.h ../include/gtest/gtest.h > /dev/null 2>&1
+if [ $? != 0 ]
+then
+  cp src/gtest/gtest.h ../include/gtest/gtest.h
+fi
+diff -q src/gtest/gtest-all.cc src-extra/gtest-all.cc > /dev/null 2>&1
+if [ $? != 0 ]
+then
+  cp src/gtest/gtest-all.cc src-extra/gtest-all.cc
+fi
 
