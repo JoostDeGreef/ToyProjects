@@ -7,12 +7,14 @@ if(CMAKE_COMPILER_IS_GNUCC)
     link_libraries(GoogleTest Threads::Threads)
 endif(CMAKE_COMPILER_IS_GNUCC)
 
-link_libraries(GoogleTest
-               MathCore)
+add_definitions("-DBOOST_ALL_NO_LIB=1")
 
-add_executable (MathCoreTest
-                "VectorTest.cpp"
-				"QuaternionTest.cpp"
-                "MathCoreTest.cpp")
+link_libraries(GoogleTest 
+               Boost-FileSystem
+			   SQLiteDB)
 
-#install(TARGETS MathCoreTest DESTINATION ../../bin)
+add_executable (3rdPartyTest
+                "GoogleTest/OutputTest.cpp"
+				"SQLite/SQLiteTest.cpp"
+                "Boost/FileSystemTest.cpp")
+
