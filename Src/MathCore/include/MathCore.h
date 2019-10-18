@@ -1,4 +1,7 @@
-﻿#pragma once
+#pragma once
+
+#include <limits>
+#include <random>
 
 #include "internal/Constants.h"
 #include "internal/Limits.h"

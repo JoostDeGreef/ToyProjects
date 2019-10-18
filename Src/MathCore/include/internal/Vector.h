@@ -94,7 +94,7 @@ private:
 		return Numerics::Equal(m_data[index], other.m_data[index]) && IsEqualIndex<index + 1>(other);
 	}
 	template<>
-	bool IsEqualIndex<dimension>(const this_type& other) const
+	bool IsEqualIndex<DIMENSION>(const this_type& other) const
 	{
 		return true;
 	}
