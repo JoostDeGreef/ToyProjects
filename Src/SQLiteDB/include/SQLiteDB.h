@@ -6,8 +6,8 @@
 
 #include "boost/format.hpp"
 
-#include "internal-SQLiteDB/DataType.h"
-#include "internal-SQLiteDB/Query.h"
-#include "internal-SQLiteDB/Statement.h"
-#include "internal-SQLiteDB/DB.h"
+#include "internal/DataType.h"
+#include "internal/Query.h"
+#include "internal/Statement.h"
+#include "internal/DB.h"
 

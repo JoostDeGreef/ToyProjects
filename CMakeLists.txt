@@ -7,15 +7,13 @@ cmake_minimum_required (VERSION 3.8)
 project ("ToyProjects")
 
 # All include directories
-include_directories("3rdParty/include"
-#                    "Src/MathCore/include"
-                    "Src/SQLiteDB/include")
+include_directories("3rdParty/include")
 
 # Include sub-projects.
 add_subdirectory ("Src")
 add_subdirectory ("3rdParty")
 
-# output will land here
+# Output will land here
 SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY
     ${PROJECT_SOURCE_DIR}/out/lib/${CMAKE_BUILD_TYPE} CACHE
     PATH "Directory where all the .lib files are dumped." FORCE)

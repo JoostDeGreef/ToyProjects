@@ -6,9 +6,11 @@ endif(CMAKE_COMPILER_IS_GNUCC)
 
 add_definitions("-DBOOST_ALL_NO_LIB=1")
 
+project(SQLiteTest)
+
 link_libraries(GoogleTest 
 			   SQLiteDB)
 
-add_executable (SQLiteTest
+add_executable (${PROJECT_NAME}
 				"SQLiteTest.cpp")
 
