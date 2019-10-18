@@ -8,7 +8,7 @@ project ("ToyProjects")
 
 # All include directories
 include_directories("3rdParty/include"
-                    "Src/MathCore/include"
+#                    "Src/MathCore/include"
                     "Src/SQLiteDB/include")
 
 # Include sub-projects.

@@ -1,11 +1,6 @@
-#include "boost/format.hpp"
 #include "gtest/gtest.h"
 
 using namespace testing;
-
-#include <string>
-#include <memory>
-#include <vector>
 
 #include "SQLiteDB.h"
 
@@ -46,3 +41,16 @@ TEST_F(SQLiteTest, Query)
     }
     EXPECT_EQ(45, sum);
 }
+
+TEST_F(SQLiteTest, SingleInt64)
+{
+	SQLite::DB db;
+	db.Open(":memory:", false);
+	db.ExecDML("CREATE TABLE a(a);");
+	EXPECT_TRUE(db.TableExists("a"));
+	int count = db.ExecDML("INSERT INTO a VALUES(%1%);", 42);
+	EXPECT_EQ(1, count);
+	EXPECT_EQ(42, db.ExecSingleInt64("SELECT a FROM a;"));
+}
+
+

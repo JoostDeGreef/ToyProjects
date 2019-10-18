@@ -5,9 +5,11 @@ cmake_minimum_required (VERSION 3.8)
 
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
-# Add source to this project's executable.
-add_library (MathCore SHARED 
-             "src/MathCore.cpp"
-			 "include/MathCore.h")
+project(MathCore)
 
-#install(TARGETS MathCore DESTINATION ../../bin)
+# Add source to this project's executable.
+add_library (${PROJECT_NAME} SHARED 
+             "src/MathCore.cpp")
+
+# directories where to search for header files
+target_include_directories(${PROJECT_NAME} PUBLIC include)

@@ -103,6 +103,18 @@ string DB::ExecSingleString(const std::string& sql)
     return q.GetStringField(0);
 }
 
+double DB::ExecSingleFloat(const std::string& sql)
+{
+	Query q = ExecQuery(sql);
+
+	if (q.IsEOF() || q.GetFieldCount() != 1)
+	{
+		ThrowError("Invalid single float query");
+	}
+
+	return q.GetFloatField(0);
+}
+
 Statement DB::CompileStatement(const std::string& sql)
 {
     sqlite3_stmt* statement = m_state->Compile(sql);

@@ -10,11 +10,9 @@ endif(CMAKE_COMPILER_IS_GNUCC)
 add_definitions("-DBOOST_ALL_NO_LIB=1")
 
 link_libraries(GoogleTest 
-               Boost-FileSystem
-			   SQLiteDB)
+               Boost-FileSystem)
 
 add_executable (3rdPartyTest
                 "GoogleTest/OutputTest.cpp"
-				"SQLite/SQLiteTest.cpp"
                 "Boost/FileSystemTest.cpp")
 

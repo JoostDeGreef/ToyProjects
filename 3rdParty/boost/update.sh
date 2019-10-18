@@ -64,6 +64,6 @@ mv tmp/${BASE} boost
 
 echo "Installing headers"
 mkdir -p ../include/
-rsync -a boost/boost ../include/boost
+rsync -a boost/boost/ ../include/boost/
 
 
