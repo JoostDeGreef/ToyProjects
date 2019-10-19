@@ -1,11 +1,10 @@
-﻿# CMakeList.txt : CMake project for MathCore, include source and define
-# project specific logic here.
-#
-include(Library)
+﻿include(Library)
 
-# Add source to this project's executable.
-add_library (MathCore SHARED 
-             "src/MathCore.cpp"
-			 "include/MathCore.h")
+project(MathCore)
 
-#install(TARGETS MathCore DESTINATION ../../bin)
+add_library (${PROJECT_NAME} SHARED 
+             "src/MathCore.cpp")
+
+# directories where to search for header files
+target_include_directories(${PROJECT_NAME} PUBLIC include)
+

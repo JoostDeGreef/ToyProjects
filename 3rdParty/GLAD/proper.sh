@@ -1,0 +1,8 @@
+#!/bin/bash
+
+rm -rf glad
+rm -rf tmp
+rm -rf ../include/GLAD ../include/KHR
+
+find . -name "*~" -exec rm -f "{}" \;
+
