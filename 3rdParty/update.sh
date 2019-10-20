@@ -7,4 +7,5 @@
 (cd boost;./update.sh) || exit 1
 (cd freetype;./update.sh) || exit 1
 (cd PNG;./update.sh) || exit 1
+(cd ZLIB;./update.sh) || exit 1
 
