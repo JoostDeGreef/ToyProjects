@@ -11,13 +11,13 @@ then
   exit 1
 fi
 
-if [ ! -d googletest ];
+if [ ! -d ${SRC} ];
 then
   echo "Getting ${Project}"
   git clone ${REPO}
 else
   echo "Updating ${Project}"
-  git pull
+  (cd ${SRC};git pull)
 fi
 
 echo "Rebuilding fused src"

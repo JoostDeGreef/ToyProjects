@@ -9,10 +9,6 @@ project ("ToyProjects")
 # All include directories
 include_directories("3rdParty/include")
 
-# Include sub-projects.
-add_subdirectory ("Src")
-add_subdirectory ("3rdParty")
-
 # Output will land here
 SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY
     ${PROJECT_SOURCE_DIR}/out/lib/${CMAKE_BUILD_TYPE} CACHE
@@ -23,4 +19,8 @@ SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY
 SET(CMAKE_MODULE_PATH
     ${PROJECT_SOURCE_DIR}/cmake CACHE
     PATH "Directory where .cmake files are stored." FORCE)
+
+# Include sub-projects.
+add_subdirectory ("Src")
+add_subdirectory ("3rdParty")
 

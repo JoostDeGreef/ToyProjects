@@ -9,8 +9,13 @@ then
   git clone ${REPO}
 else
   echo "Updating ${Project}"
-  git pull
+#  (cd ${SRC};git checkout .)
+  (cd ${SRC};git pull)
 fi
+
+#sed -i glfw/CMakeLists.txt -e "s|set(GLFW_LIB_NAME.*$|set(GLFW_LIB_NAME GLFW)|g"
+#echo "include(Library)" >> glfw/CMakeLists.txt
+#echo "add_library (GLFW \"glad/src/glad.c\")" >> glfw/CMakeLists.txt
 
 echo "Installing headers"
 mkdir -p ../include
