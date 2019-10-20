@@ -6,5 +6,6 @@
 (cd GLAD;./proper.sh)
 (cd boost;./proper.sh)
 (cd freetype;./proper.sh)
+(cd PNG;./proper.sh)
 
 
