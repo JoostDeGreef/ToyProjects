@@ -276,7 +276,7 @@ TQuaternion<VALUE_TYPE> Slerp(TQuaternion<VALUE_TYPE> const& q0, TQuaternion<VAL
 		return q1;
 	}
 	// make the start/end smooth (acceleration)
-	t = 0.5 * (1 - cos(t * Common::Pi));
+	t = 0.5 * (1 - cos(t * Constants::Pi));
 	// Calculate angle between them.
 	VALUE_TYPE cosHalfTheta = q0.InnerProduct(q1);
 	// if q0=q1 or q0=-q1 then theta = 0 and we can return q0
@@ -292,7 +292,7 @@ TQuaternion<VALUE_TYPE> Slerp(TQuaternion<VALUE_TYPE> const& q0, TQuaternion<VAL
 	}
 	// Calculate temporary values.
 	VALUE_TYPE halfTheta = acos(cosHalfTheta);
-	VALUE_TYPE sinHalfTheta = sqrt(1.0 - Common::Sqr(cosHalfTheta));
+	VALUE_TYPE sinHalfTheta = sqrt(1.0 - Numerics::Sqr(cosHalfTheta));
 	// if theta = 180 degrees then result is not fully defined
 	// we could rotate around any axis normal to q0 or q1
 	if (abs(sinHalfTheta) < 0.001)

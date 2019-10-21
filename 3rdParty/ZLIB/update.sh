@@ -13,5 +13,7 @@ else
 fi
 
 echo "Installing headers"
-#mkdir -p ../include
-#rsync -a ${SRC}/include/GLFW/ ../include/GLFW/
+mkdir -p ../include/ZLIB
+rsync -a ${SRC}/zlib.h ../include/ZLIB/zlib.h
+rsync -a ${SRC}/zconf.h ../include/ZLIB/zconf.h
+

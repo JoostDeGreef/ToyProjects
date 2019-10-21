@@ -84,7 +84,7 @@ Query Statement::ExecQuery()
     {
         ret = sqlite3_reset(m_state->m_statement);
         ThrowErrorIfNotOK(m_state->m_db, ret);
-        return nullptr;
+        return Query();
     }
 }
 

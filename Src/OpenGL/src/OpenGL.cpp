@@ -1,6 +1,6 @@
 #include "OpenGL.h"
 
-#include "glad/glad.h"
+#include "GLAD/glad.h"
 
 void OpenGL::glColor(const RGBAColorf & color)
 {

@@ -75,7 +75,7 @@ Query DB::ExecQuery(const std::string& sql)
     {
         ret = sqlite3_finalize(statement);
         ThrowError(m_state->m_db, ret);
-        return nullptr;
+        return Query();
     }
 }
 

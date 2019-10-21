@@ -10,10 +10,11 @@ public:
 	typedef VALUE_TYPE value_type;
 	typedef unsigned int index_type;
 	typedef unsigned int size_type;
-	static const size_type dimension = DIMENSION;
+	
+	static const size_type dimension;
 
 private:
-	std::array<value_type, dimension> m_data;
+	std::array<value_type, DIMENSION> m_data;
 
 public:
 	TVector()
@@ -59,12 +60,12 @@ public:
 	template<typename ...Args>
 	void Set(const value_type& value, const Args&... values)
 	{
-		static_assert(sizeof...(values) + 1 == dimension, "Incorrect number of values");
+		static_assert(sizeof...(values) + 1 == DIMENSION, "Incorrect number of values");
 		SetIndex<0>(value, values...);
 	}
 	void Set(const value_type* data)
 	{
-		for (index_type i = 0; i < dimension; ++i)
+		for (index_type i = 0; i < DIMENSION; ++i)
 		{
 			m_data[i] = data[i];
 		}
@@ -72,7 +73,7 @@ public:
 
 	void Fill(const value_type& value)
 	{
-		for (index_type i = 0; i < dimension; ++i)
+		for (index_type i = 0; i < DIMENSION; ++i)
 		{
 			m_data[i] = value;
 		}
@@ -87,21 +88,17 @@ public:
 		return m_data.data();
 	}
 
-private:
-	template<index_type index>
-	bool IsEqualIndex(const this_type& other) const
-	{
-		return Numerics::Equal(m_data[index], other.m_data[index]) && IsEqualIndex<index + 1>(other);
-	}
-	template<>
-	bool IsEqualIndex<DIMENSION>(const this_type& other) const
-	{
-		return true;
-	}
 public:
 	bool operator == (const this_type& other) const
 	{
-		return IsEqualIndex<0>(other);
+		for (index_type i = 0; i < DIMENSION; ++i)
+		{
+			if( !Numerics::Equal(m_data[i], other[i]) )
+			{
+			  return false;
+			}
+		}
+		return true;
 	}
 
 	const value_type& operator [] (const index_type& index) const
@@ -116,7 +113,7 @@ public:
 	value_type InnerProduct(const this_type& other) const
 	{
 		value_type res = m_data[0] * other[0];
-		for (index_type i = 1; i < dimension; ++i)
+		for (index_type i = 1; i < DIMENSION; ++i)
 		{
 			res += m_data[i] * other[i];
 		}
@@ -126,7 +123,7 @@ public:
 	this_type OuterProduct(const this_type& other) const
 	{
 		this_type res;
-		for (index_type i = 0; i < dimension; ++i)
+		for (index_type i = 0; i < DIMENSION; ++i)
 		{
 			res[i] = m_data[i] * other[i];
 		}
@@ -151,7 +148,7 @@ public:
 	value_type LengthSquared() const
 	{
 		value_type res = pow(m_data[0], 2);
-		for (index_type i = 1; i < dimension; ++i)
+		for (index_type i = 1; i < DIMENSION; ++i)
 		{
 			res += pow(m_data[i], 2);
 		}
@@ -172,7 +169,7 @@ public:
 	this_type operator + (const this_type& other) const
 	{
 		this_type res;
-		for (index_type i = 0; i < dimension; ++i)
+		for (index_type i = 0; i < DIMENSION; ++i)
 		{
 			res[i] = m_data[i] + other[i];
 		}
@@ -180,7 +177,7 @@ public:
 	}
 	this_type& operator += (const this_type& other)
 	{
-		for (index_type i = 0; i < dimension; ++i)
+		for (index_type i = 0; i < DIMENSION; ++i)
 		{
 			m_data[i] += other[i];
 		}
@@ -190,7 +187,7 @@ public:
 	this_type operator - (const this_type& other) const
 	{
 		this_type res;
-		for (index_type i = 0; i < dimension; ++i)
+		for (index_type i = 0; i < DIMENSION; ++i)
 		{
 			res[i] = m_data[i] - other[i];
 		}
@@ -198,7 +195,7 @@ public:
 	}
 	this_type& operator -= (const this_type& other)
 	{
-		for (index_type i = 0; i < dimension; ++i)
+		for (index_type i = 0; i < DIMENSION; ++i)
 		{
 			m_data[i] -= other[i];
 		}
@@ -208,7 +205,7 @@ public:
 	this_type operator * (const value_type& value) const
 	{
 		this_type res;
-		for (index_type i = 0; i < dimension; ++i)
+		for (index_type i = 0; i < DIMENSION; ++i)
 		{
 			res[i] = m_data[i] * value;
 		}
@@ -216,7 +213,7 @@ public:
 	}
 	this_type& operator *= (const value_type& value)
 	{
-		for (index_type i = 0; i < dimension; ++i)
+		for (index_type i = 0; i < DIMENSION; ++i)
 		{
 			m_data[i] *= value;
 		}
@@ -226,7 +223,7 @@ public:
 	this_type operator / (const value_type& value) const
 	{
 		this_type res;
-		for (index_type i = 0; i < dimension; ++i)
+		for (index_type i = 0; i < DIMENSION; ++i)
 		{
 			res[i] = m_data[i] / value;
 		}
@@ -234,13 +231,16 @@ public:
 	}
 	this_type& operator /= (const value_type& value)
 	{
-		for (index_type i = 0; i < dimension; ++i)
+		for (index_type i = 0; i < DIMENSION; ++i)
 		{
 			m_data[i] /= value;
 		}
 		return *this;
 	}
 };
+
+template<typename VALUE_TYPE, unsigned int DIMENSION>
+const typename TVector<VALUE_TYPE, DIMENSION>::size_type TVector<VALUE_TYPE, DIMENSION>::dimension = DIMENSION;
 
 template<typename VALUE_TYPE>
 using TVector3 = TVector<VALUE_TYPE, 3>;
