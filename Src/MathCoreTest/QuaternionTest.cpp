@@ -1,4 +1,5 @@
 #include "gtest/gtest.h"
+
 #include "MathCore.h"
 
 using namespace std;

@@ -46,11 +46,12 @@ else
   (cd tmp;wget ${LINK})
 fi
 
-rm -rf boost
-
 BASE=`basename ${FILE} .tar.gz`
-(cd tmp;rm -f ${BASE};tar -xzf ${FILE})
-mv tmp/${BASE} boost
+if [ ! -d tmp/${BASE} ]
+then
+  (cd tmp;rm -f ${BASE};tar -xzf ${FILE})
+fi
+rsync -a tmp/${BASE}/ boost/
 
 #echo "Recreating Makefile.version"
 #LONG_VERSION=`echo ${FILE}|cut -d'.' -f 1|rev|cut -d'_' -f1-3|rev|tr '_' '.'`

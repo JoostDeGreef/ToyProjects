@@ -131,7 +131,7 @@ public:
 	}
 
 	template<typename VECTOR_TYPE = this_type>
-	typename std::enable_if<3 == VECTOR_TYPE::dimension, VECTOR_TYPE>::type
+	typename std::enable_if<3 == DIMENSION, VECTOR_TYPE>::type
 		Cross(const this_type& other) const
 	{
 		return this_type(

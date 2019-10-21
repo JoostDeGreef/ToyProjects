@@ -7,6 +7,6 @@ link_libraries(GoogleTest
 
 add_executable (${PROJECT_NAME}
                 "VectorTest.cpp"
-		"QuaternionTest.cpp"
+                "QuaternionTest.cpp"
                 "MathCoreTest.cpp")
 
