@@ -1,13 +1,10 @@
-# CMakeList.txt : Top-level CMake project file, do global configuration
-# and include sub-projects here.
-#
-cmake_minimum_required (VERSION 3.8)
+cmake_minimum_required (VERSION 3.9)
 
 # These are just toy projects, make that clear
-project ("ToyProjects")
+project ("ToyProjects" VERSION 0.0.1)
 
-# All include directories
-include_directories("3rdParty/include")
+SET( CMAKE_CXX_STANDARD 14 )
+SET( CMAKE_CXX_STANDARD_REQUIRED ON )
 
 # Output will land here
 SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY

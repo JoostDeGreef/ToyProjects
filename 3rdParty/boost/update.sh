@@ -64,7 +64,7 @@ rsync -a tmp/${BASE}/ boost/
 #EOF
 
 echo "Installing headers"
-mkdir -p ../include/
-rsync -a boost/boost/ ../include/boost/
+mkdir -p include/
+rsync -a boost/boost/ include/boost/
 
 

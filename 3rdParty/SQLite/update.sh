@@ -30,11 +30,7 @@ fi
 #EOF
 
 echo "Installing headers"
-mkdir -p ../include/sqlite
-diff -q sqlite/sqlite3.h ../include/sqlite/sqlite3.h > /dev/null 2>&1
-if [ $? != 0 ]
-then
-  cp sqlite/sqlite3.h ../include/sqlite/sqlite3.h
-fi
+mkdir -p include/sqlite
+rsync sqlite/sqlite3.h include/sqlite/sqlite3.h 
 
 

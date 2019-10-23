@@ -1,11 +1,23 @@
-include(Library)
+cmake_minimum_required(VERSION 3.9)
 
-# Add source to this project's executable.
-add_library (GoogleTest SHARED 
-             "src-extra/gtest-all.cc"
+project(GoogleTest VERSION 1.0.0 DESCRIPTION "Google test framework")
+
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+
+add_library (${PROJECT_NAME} SHARED 
+             "src/gtest/gtest-all.cc"
              "src-extra/ConsoleOutput.cpp"
              "src-extra/ConsoleOutput.h"
              "src-extra/GoogleTestMain.cpp"
              "src-extra/VisualStudioOutput.cpp"
              "src-extra/VisualStudioOutput.h")
+
+set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${PROJECT_VERSION})
+
+target_include_directories(${PROJECT_NAME}
+    PUBLIC 
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src-extra
+)
 

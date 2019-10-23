@@ -2,7 +2,7 @@
 
 rm -rf boost
 rm -rf tmp
-rm -rf ../include/boost
+rm -rf include
 
 find . -name "*~" -exec rm -f "{}" \;
 
