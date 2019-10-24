@@ -18,8 +18,12 @@ ExternalProject_Add(zlib
          -DCMAKE_INSTALL_PREFIX:PATH=${ZLIB_DIR}
 )
 
-SET(ZLIB_FILE ${ZLIB_DIR}/lib/zlibstatic)
 SET(ZLIB_HEADER_FOLDER ${ZLIB_DIR}/include)
+if(UNIX)
+   SET(ZLIB_FILE ${ZLIB_DIR}/lib/libz.a)
+else
+   SET(ZLIB_FILE ${ZLIB_DIR}/lib/zlib.lib)
+endif()
 
 # how to build the result of the library
 #add_custom_command(OUTPUT  ${LIB_FILE}
@@ -27,7 +31,8 @@ SET(ZLIB_HEADER_FOLDER ${ZLIB_DIR}/include)
 #                   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
 # create a target out of the library compilation result
-add_custom_target(zlib_target DEPENDS ${ZLIB_FILE})
+#add_custom_target(zlib_target DEPENDS ${ZLIB_FILE})
+add_custom_target(zlib_target DEPENDS zlib)
 
 # create an library target out of the library compilation result
 add_library(ZLIB STATIC IMPORTED GLOBAL)

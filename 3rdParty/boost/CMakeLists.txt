@@ -9,6 +9,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 add_library(${PROJECT_NAME} INTERFACE)
 
 add_subdirectory ("libs/filesystem")
+add_subdirectory ("libs/iostreams")
 
 target_compile_definitions(${PROJECT_NAME} 
     INTERFACE

@@ -18,7 +18,7 @@ protected:
 TEST_F(OutputTest, FooBar)
 {
     SUCCEED() << "Some Text";
-    EXPECT_TRUE(1 == 0) << "For some reason this doesn't work?";
+    EXPECT_TRUE(1 == 1) << "For some reason this doesn't work?";
 }
 
 

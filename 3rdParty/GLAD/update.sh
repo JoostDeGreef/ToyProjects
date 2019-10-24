@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ -f tmp/glad.zip ] && [ -f include/GLAD/glad.h ]
+if [ -f tmp/glad.zip ]
 then
   echo "GLAD already downloaded"
 else
@@ -17,15 +17,12 @@ else
 
   mkdir -p tmp
   curl ${LINK} > tmp/glad.zip
+fi
 
+if [ ! -d glad ]
+then
   echo "Unpacking package"
   rm -rf glad
   mkdir glad
   (cd glad;unzip ../tmp/glad.zip)
- 
-#  echo "Installing headers"
-#  mkdir -p include/GLAD include/KHR
-#  rsync -a glad/include/glad/ include/GLAD/
-#  rsync -a glad/include/KHR/ include/KHR/
-fi
-
+fi 

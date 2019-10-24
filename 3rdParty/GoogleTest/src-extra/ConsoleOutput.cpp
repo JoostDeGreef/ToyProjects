@@ -124,15 +124,19 @@ void ConsoleOutput::OnTestStart(const TestInfo& test_info)
 // Called after a failed assertion or a SUCCEED() invocation.
 void ConsoleOutput::OnTestPartResult(const TestPartResult& test_part_result) 
 {
-	if( !test_part_result.failed() )
+    if( !test_part_result.failed() )
     {
         const char *message = test_part_result.message();
         const char *user = strchr(message, '\n');
-        if(user != nullptr )
+        if(user != nullptr)
         {
-            message = user + 1;
+            while(*user == '\n' || *user == '\r')
+            {
+              user++;
+            }
+            message = user;
         }
-        OutputFormattedString("[    DEBUG ] %s", message);
+        std::cout << "[    DEBUG ] " << message << std::endl;
     }
 }
 
