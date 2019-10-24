@@ -1,3 +1,4 @@
-﻿# Include sub-projects.
+include(Common)
+
 add_subdirectory ("freetype")
 

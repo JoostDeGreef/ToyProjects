@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.9)
+include(Common)
 
 project(GoogleTest VERSION 1.0.0 DESCRIPTION "Google test framework")
 
@@ -14,8 +14,16 @@ add_library (${PROJECT_NAME} SHARED
 
 set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${PROJECT_VERSION})
 
+if(CMAKE_COMPILER_IS_GNUCC)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
+    set(THREADS_PREFER_PTHREAD_FLAG ON)
+    find_package(Threads REQUIRED)
+    target_link_libraries(${PROJECT_NAME} INTERFACE Threads::Threads)
+endif(CMAKE_COMPILER_IS_GNUCC)
+
 target_include_directories(${PROJECT_NAME}
-    PUBLIC 
+    PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src-extra

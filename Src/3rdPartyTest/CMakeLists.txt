@@ -1,9 +1,12 @@
-include(Executable)
+include(Common)
+
+project(3rdPartyTest)
 
 link_libraries(GoogleTest 
+               boost
                Boost-FileSystem)
 
-add_executable (3rdPartyTest
+add_executable (${PROJECT_NAME}
                 "GoogleTest/OutputTest.cpp"
                 "Boost/FileSystemTest.cpp")
 

@@ -9,7 +9,6 @@ then
   git clone ${REPO}
 else
   echo "Updating ${Project}"
-#  (cd ${SRC};git checkout .)
   (cd ${SRC};git pull)
 fi
 
@@ -17,6 +16,6 @@ fi
 #echo "include(Library)" >> glfw/CMakeLists.txt
 #echo "add_library (GLFW \"glad/src/glad.c\")" >> glfw/CMakeLists.txt
 
-echo "Installing headers"
-mkdir -p ../include
-rsync -a ${SRC}/include/GLFW/ ../include/GLFW/
+#echo "Installing headers"
+#mkdir -p ../include
+#rsync -a ${SRC}/include/GLFW/ ../include/GLFW/

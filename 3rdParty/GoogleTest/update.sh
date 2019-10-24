@@ -24,9 +24,5 @@ python ./googletest/googletest/scripts/fuse_gtest_files.py src
 
 echo "Installing headers"
 mkdir -p include/gtest
-diff -q src/gtest/gtest.h include/gtest/gtest.h > /dev/null 2>&1
-if [ $? != 0 ]
-then
-  cp src/gtest/gtest.h include/gtest/gtest.h
-fi
+rsync -a src/gtest/gtest.h include/gtest/gtest.h 
 

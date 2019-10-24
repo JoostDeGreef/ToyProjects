@@ -37,7 +37,7 @@ then
   mv tmp/$(basename ${FILE} .tar.bz2) freetype   
 fi
 
-echo "Installing headers"
-mkdir -p ../include/
-rsync -a freetype/include/freetype/ ../include/freetype/
+#echo "Installing headers"
+#mkdir -p ../include/
+#rsync -a freetype/include/freetype/ ../include/freetype/
 

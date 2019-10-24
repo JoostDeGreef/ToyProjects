@@ -1,4 +1,4 @@
-﻿# Include sub-projects.
+# Include sub-projects.
 add_subdirectory ("GoogleTest")
 add_subdirectory ("boost")
 add_subdirectory ("SQLite")
@@ -6,4 +6,4 @@ add_subdirectory ("SQLite")
 #add_subdirectory ("GLAD")
 #add_subdirectory ("freetype")
 add_subdirectory ("ZLIB")
-#add_subdirectory ("PNG")
+add_subdirectory ("PNG")

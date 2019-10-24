@@ -16,18 +16,20 @@ then
   tar -xzf download/sqlite.tar.gz
   
   echo "Creating amalgation"
-  (cd sqlite;sh configure;make sqlite3.c)
+  (cd sqlite;sh configure;make sqlite3.c)  
+  
+  echo "Recreating SQLiteVersion.cmake"
+  VERSION=`cat sqlite/VERSION|head -n 1`
+  cat << EOF > SQLiteVersion.cmake
+set(SQLITE_VERSION ${VERSION})
+EOF
 fi
 
-#echo "Recreating Makefile.version"
-#LONG_VERSION=`cat sqlite/VERSION|head -n 1`
-#SHORT_VERSION=`echo ${LONG_VERSION}|cut -d'.' -f 1`
-#cat << EOF > Makefile.version
-##LONG_VERSION:=.${LONG_VERSION}
-##SHORT_VERSION:=.${SHORT_VERSION}
-#LONG_VERSION:=
-#SHORT_VERSION:=
-#EOF
+echo "Recreating SQLiteVersion.cmake"
+VERSION=`cat sqlite/VERSION|head -n 1`
+cat << EOF > SQLiteVersion.cmake
+set(SQLITE_VERSION ${VERSION})
+EOF
 
 echo "Installing headers"
 mkdir -p include/sqlite

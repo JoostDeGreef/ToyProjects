@@ -1,4 +1,4 @@
-include(Executable)
+include(Common)
 
 project(SQLiteTest)
 
@@ -7,5 +7,5 @@ link_libraries(GoogleTest
                ${CMAKE_DL_LIBS})
 
 add_executable (${PROJECT_NAME}
-				"SQLiteTest.cpp")
+                "SQLiteTest.cpp")
 

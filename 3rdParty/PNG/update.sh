@@ -14,8 +14,8 @@ else
   (cd ${SRC};git pull)
 fi
 
-echo "Installing headers"
-mkdir -p ../include/PNG
-rsync -a ${SRC}/png.h ../include/PNG/png.h
-rsync -a ${SRC}/scripts/pnglibconf.h.prebuilt ../include/PNG/pnglibconf.h
+#echo "Installing headers"
+#mkdir -p include/PNG
+#rsync -a ${SRC}/png.h include/PNG/png.h
+#rsync -a ${SRC}/scripts/pnglibconf.h.prebuilt include/PNG/pnglibconf.h
 

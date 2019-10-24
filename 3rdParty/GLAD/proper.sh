@@ -2,7 +2,7 @@
 
 rm -rf glad
 rm -rf tmp
-rm -rf ../include/GLAD ../include/KHR
+rm -rf include
 
 find . -name "*~" -exec rm -f "{}" \;
 

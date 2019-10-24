@@ -10,7 +10,7 @@ egrep -o '([0-9])*\.([0-9])*\.([0-9])*' | \
 sort -r | \
 head -n 10`
 
-echo -e "Available versions:\n${VERSIONS}"
+#echo -e "Available versions:\n${VERSIONS}"
 
 FILE=""
 for VERSION in ${VERSIONS}

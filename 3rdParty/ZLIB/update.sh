@@ -14,8 +14,8 @@ fi
 
 sed -i zlib/CMakeLists.txt -e 's|set(CMAKE_DEBUG_POSTFIX "d")||g'
 
-echo "Installing headers"
-mkdir -p ../include/ZLIB
-rsync -a ${SRC}/zlib.h ../include/ZLIB/zlib.h
-rsync -a ${SRC}/zconf.h ../include/ZLIB/zconf.h
+#echo "Installing headers"
+#mkdir -p include/ZLIB
+#rsync -a ${SRC}/zlib.h include/ZLIB/zlib.h
+#rsync -a ${SRC}/zconf.h include/ZLIB/zconf.h
 
