@@ -12,7 +12,7 @@ else
   (cd ${SRC};git pull)
 fi
 
-sed -i zlib/CMakeLists.txt -e 's|set(CMAKE_DEBUG_POSTFIX "d")||g'
+#sed -i zlib/CMakeLists.txt -e 's|set(CMAKE_DEBUG_POSTFIX "d")||g'
 
 #echo "Installing headers"
 #mkdir -p include/ZLIB

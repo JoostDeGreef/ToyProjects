@@ -1,11 +1,11 @@
-﻿include(Library)
+﻿include(Common)
 
 project(OpenGL)
 
 link_libraries(MathCore
                GLAD
 			   GLFW
-			   freetype)
+			   FREETYPE)
 
 add_library (${PROJECT_NAME} SHARED 
              "src/OpenGL.cpp")
