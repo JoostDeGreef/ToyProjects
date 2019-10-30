@@ -183,7 +183,36 @@ void UserInterfaceImp::Run()
 }
 
 void UserInterfaceImp::Draw()
-{}
+{
+    std::unique_lock<std::mutex> lock(m_mutex);
+    
+    float ratio = m_width / (float)m_height;
+    glViewport(0, 0, m_width, m_height);
+    glStencilMask(0xFF);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    glStencilMask(0x00);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(-ratio, ratio, -1.0, 1.0, -1.1, 1.1);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+//    DrawShapes();
+
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_LIGHTING);
+    glDepthMask(GL_FALSE);
+
+//    DrawFPS();
+
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_LIGHTING);
+    glDepthMask(GL_TRUE);
+
+    lock.unlock();
+
+    glfwSwapBuffers(m_window);
+}
 
 void UserInterfaceImp::Cleanup()
 {
