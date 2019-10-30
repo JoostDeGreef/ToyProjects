@@ -6,4 +6,5 @@ add_subdirectory ("MathCoreTest")
 add_subdirectory ("SQLiteDB")
 add_subdirectory ("SQLiteDBTest")
 add_subdirectory ("OpenGL")
+add_subdirectory ("OpenGLTest")
 
