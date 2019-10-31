@@ -26,3 +26,5 @@ echo "Installing headers"
 mkdir -p include/gtest
 rsync -a src/gtest/gtest.h include/gtest/gtest.h 
 
+echo "Recreating BuildNumber.txt"
+(cd ${SRC};git tag | grep release | cut -d- -f2 | sort -r --version-sort --field-separator=. | head -n 1) > BuildNumber.txt

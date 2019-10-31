@@ -1,10 +1,13 @@
 include(Common)
 
-project(GoogleTest VERSION 1.0.0 DESCRIPTION "Google test framework")
+set(PARENT ${PROJECT_NAME})
+
+file(STRINGS "BuildNumber.txt" BUILD_NUMBER)
+project(GoogleTest VERSION ${BUILD_NUMBER} DESCRIPTION "Google test framework")
 
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
-add_library (${PROJECT_NAME} SHARED 
+add_library (${PROJECT_NAME} SHARED
              "src/gtest/gtest-all.cc"
              "src-extra/ConsoleOutput.cpp"
              "src-extra/ConsoleOutput.h"
@@ -12,7 +15,10 @@ add_library (${PROJECT_NAME} SHARED
              "src-extra/VisualStudioOutput.cpp"
              "src-extra/VisualStudioOutput.h")
 
+# make sure there is no confusion about the origin of this library
+set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME ${PARENT}-${PROJECT_NAME})
 set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${PROJECT_VERSION})
+set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
 
 if(CMAKE_COMPILER_IS_GNUCC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")

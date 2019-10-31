@@ -1,7 +1,8 @@
 # source project
 googletest
 
-# generated directories
+# generated directories/files
 src
 tmp
 include
+BuildNumber.txt
