@@ -11,7 +11,7 @@ ExternalProject_Add(zlib
          -DCMAKE_INSTALL_PREFIX:PATH=${ZLIB_DIR}
          -DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=true
          -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS:BOOL=true
-		 -DCMAKE_DEBUG_POSTFIX:STRING=
+         -DCMAKE_DEBUG_POSTFIX:STRING=
 )
 
 SET(ZLIB_HEADER_FOLDER ${ZLIB_DIR}/include)
@@ -32,5 +32,4 @@ add_custom_target(zlib_target DEPENDS ${ZLIB_FILE})
 add_library(ZLIB INTERFACE)
 add_dependencies(ZLIB zlib_target)
 target_include_directories(ZLIB INTERFACE ${ZLIB_HEADER_FOLDER})
-target_link_libraries(ZLIB INTERFACE ${ZLIB_FILE})
-
+target_link_libraries(ZLIB INTERFACE ${ZLIB_FILE} ${CMAKE_DL_LIBS})

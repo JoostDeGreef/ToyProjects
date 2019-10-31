@@ -17,3 +17,4 @@ target_include_directories(${PROJECT_NAME}
         ${CMAKE_CURRENT_SOURCE_DIR}/sqlite
 )
 
+target_link_libraries(${PROJECT_NAME} ${CMAKE_DL_LIBS})

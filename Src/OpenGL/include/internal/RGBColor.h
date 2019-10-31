@@ -1,5 +1,7 @@
 #pragma once
 
+#include "ColorValues.h"
+
 namespace OpenGL
 {
     template<typename VALUE_TYPE>
@@ -100,52 +102,12 @@ namespace OpenGL
         static constexpr this_type White()  { return this_type(Value::Hi(), Value::Hi(), Value::Hi()); }
     private:
 
-        template <typename T>
-        class TValue
-        {
-        public:
-            static constexpr T Hi() { static_assert(false, "Type not supported"); }
-            static constexpr T Lo() { static_assert(false, "Type not supported"); }
-            static           T Rnd() { static_assert(false, "Type not supported"); }
-            static unsigned int ToByte(const T &value) { static_assert(false, "Type not supported"); }
-            static           T FromByte(const unsigned int value) { static_assert(false, "Type not supported"); }
-        };
-        template <>
-        class TValue<float>
-        {
-        public:
-            static constexpr float Hi() { return 1.0f; }
-            static constexpr float Lo() { return 0.0f; }
-            static           float Rnd() { Common::NormalizedRandomNumber<float>(); }
-            static unsigned int ToByte(const float &value) { return (unsigned int)(value * 255); }
-            static           float FromByte(const unsigned int value) { return value / 255.0f; }
-        };
-        template <>
-        class TValue<double>
-        {
-        public:
-            static constexpr double Hi() { return 1.0; }
-            static constexpr double Lo() { return 0.0; }
-            static           double Rnd() { Common::NormalizedRandomNumber<double>(); }
-            static unsigned int ToByte(const double &value) { return (unsigned int)(value * 255); }
-            static           double FromByte(const unsigned int value) { return value / 255.0; }
-        };
-        template <>
-        class TValue<unsigned char>
-        {
-        public:
-            static constexpr unsigned char Hi() { return 255; }
-            static constexpr unsigned char Lo() { return 0; }
-            static           unsigned char Rnd() { (unsigned char)(255 * Common::NormalizedRandomNumber<double>()); }
-            static unsigned int ToByte(const unsigned int &value) { return value; }
-            static           unsigned char FromByte(const unsigned int value) { return value; }
-        };
-        using Value = TValue<value_type>;
+        using Value = TColorValue<value_type>;
     };
 
-	template<typename VALUE_TYPE> class TRGBColor;
-	using RGBColord = TRGBColor<double>;
-	using RGBColorf = TRGBColor<float>;
-	using RGBColorb = TRGBColor<unsigned char>;
+    template<typename VALUE_TYPE> class TRGBColor;
+    using RGBColord = TRGBColor<double>;
+    using RGBColorf = TRGBColor<float>;
+    using RGBColorb = TRGBColor<unsigned char>;
 }
 

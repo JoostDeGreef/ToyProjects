@@ -17,7 +17,7 @@ ExternalProject_Add(freetype
 
 SET(FREETYPE_HEADER_FOLDER ${FREETYPE_DIR}/include)
 if(UNIX)
-   SET(FREETYPE_FILE ${FREETYPE_DIR}/lib/freetype.a)
+   SET(FREETYPE_FILE ${FREETYPE_DIR}/lib/libfreetype.a)
 else()
    SET(FREETYPE_FILE ${FREETYPE_DIR}/lib/freetype.lib)
 endif()
