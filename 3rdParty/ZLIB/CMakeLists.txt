@@ -18,7 +18,7 @@ SET(ZLIB_HEADER_FOLDER ${ZLIB_DIR}/include)
 if(UNIX)
    SET(ZLIB_FILE ${ZLIB_DIR}/lib/libz.a)
 else()
-   SET(ZLIB_FILE ${ZLIB_DIR}/lib/zlib.lib)
+   SET(ZLIB_FILE ${ZLIB_DIR}/lib/zlibstatic.lib)
 endif()
 
 # how to build the result of the library

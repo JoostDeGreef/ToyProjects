@@ -15,7 +15,7 @@ then
   git clone ${REPO}
 else
   echo "Updating ${Project}"
-  (cd ${SRC};git pull)
+  (cd ${SRC};git checkout .;git pull)
 fi
 
 echo "Rebuilding fused src"

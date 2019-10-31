@@ -9,10 +9,12 @@
 #include <mutex>
 #include <functional>
 #include <iostream>
+#include <deque>
 
 using namespace std;
 using namespace std::chrono_literals;
 
+#include "boost/format.hpp"
 #include "OpenGL.h"
 #include "UI.h"
 
@@ -42,6 +44,7 @@ private:
            void window_refresh_callback();
 
     void Draw();
+    void DrawFPS();
 private:
     std::mutex m_mutex;   // mutex for state sanity during callbacks
     GLFWwindow* m_window;
@@ -203,7 +206,7 @@ void UserInterfaceImp::Draw()
     glDisable(GL_LIGHTING);
     glDepthMask(GL_FALSE);
 
-//    DrawFPS();
+    DrawFPS();
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_LIGHTING);
@@ -212,6 +215,24 @@ void UserInterfaceImp::Draw()
     lock.unlock();
 
     glfwSwapBuffers(m_window);
+}
+
+void UserInterfaceImp::DrawFPS()
+{
+    static std::deque<double> times;
+    times.push_back(glfwGetTime());
+    if (times.size() > 41)
+    {
+        times.pop_front();
+    }
+    if (/*Settings::GetBool("ShowFPS") &&*/ times.size() > 13)
+    {
+        double f = (times.size() - 1) / (times.back() - times.front());
+        std::string fps = (boost::format("FPS %1$.0f") % f).str();
+        cout << fps << endl;
+ //       auto size = m_font->GetSize(fps);
+ //       m_font->Color(Geometry::Color::Red()).Draw(m_x - size[0] - 2 * m_pixelSize, 2 * m_pixelSize - m_y, fps);
+    }
 }
 
 void UserInterfaceImp::Cleanup()

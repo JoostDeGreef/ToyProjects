@@ -5,6 +5,7 @@ project(OpenGL VERSION 1.0.0 DESCRIPTION "OpenGL functions")
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
 link_libraries(MathCore
+               boost
                GLAD
                GLFW
                FREETYPE)
