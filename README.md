@@ -7,7 +7,7 @@ https://docs.microsoft.com/en-us/windows/wsl/install-win10
 
 The scripts are tested using Ubuntu 18.10 and Ubuntu 18.04 LTS on WSL 
 
-Required software:  
+Required/suggested software:  
 git  
 curl  
 gcc / g++  
@@ -16,5 +16,6 @@ make
 cmake  
 python2  
 unzip  
+sqlite3  
 
 

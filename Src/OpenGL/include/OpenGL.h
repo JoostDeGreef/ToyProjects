@@ -4,23 +4,35 @@
 #include "GLFW/glfw3.h"
 
 #include "MathCore.h"
+
+namespace OpenGL
+{
+    using TextureCoord = Vector2d;
+    using TextureCoordPtr = TextureCoord*;
+
+    using Vertex = Vector3d;
+    using VertexPtr = Vertex*;
+
+    using Size = Vector2d;
+    using PixelSize = Vector2i;
+
+    using Normal = Vector3d;
+    using NormalPtr = Normal*;
+}
+
 #include "internal/RGBAColor.h"
 #include "internal/RGBColor.h"
 
 namespace OpenGL
 {
-	using Color = RGBAColorf;
-	using ColorPtr = Color*;
+    using Color = RGBAColorf;
+    using ColorPtr = Color*;
+}
 
-	using TextureCoord = Vector2d;
-	using TextureCoordPtr = TextureCoord*;
+#include "internal/Font.h"
 
-	using Vertex = Vector3d;
-	using VertexPtr = Vertex*;
-
-	using Normal = Vector3d;
-	using NormalPtr = Normal*;
-
+namespace OpenGL
+{
 	void glColor(const RGBAColorf& color);
     void glColor(const RGBAColord& color);
     void glColor(const RGBColorf& color);

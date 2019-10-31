@@ -251,6 +251,7 @@ template<typename VALUE_TYPE>
 using TVector2 = TVector<VALUE_TYPE, 2>;
 using Vector2d = TVector2<double>;
 using Vector2f = TVector2<float>;
+using Vector2i = TVector2<int>;
 
 template<typename VALUE_TYPE>
 inline TVector3<VALUE_TYPE> CrossProduct(const TVector3<VALUE_TYPE>& a, const TVector3<VALUE_TYPE>& b)

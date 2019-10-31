@@ -15,7 +15,7 @@ ExternalProject_Add(freetype
 		 -DDISABLE_FORCE_DEBUG_POSTFIX:BOOL=true
 )
 
-SET(FREETYPE_HEADER_FOLDER ${FREETYPE_DIR}/include)
+SET(FREETYPE_HEADER_FOLDER freetype/include)
 if(UNIX)
    SET(FREETYPE_FILE ${FREETYPE_DIR}/lib/libfreetype.a)
 else()
