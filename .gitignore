@@ -34,6 +34,9 @@
 /.vs
 /out
 
+# Temporary files created by the best editor ever (joe)
+*~
+
 /3rdParty/GoogleTest/src-extra/gtest-all.cc
 /3rdParty/include
 /3rdParty/PNG/code
