@@ -1,16 +1,11 @@
 include(Common)
 
-project(Data VERSION 1.0.0 DESCRIPTION "Data loader functions")
+project(Utils VERSION 1.0.0 DESCRIPTION "Utility functions and templates")
 
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
-link_libraries(SQLiteDB
-               Utils
-               boost
-			   Boost-FileSystem)
-
-add_library (${PROJECT_NAME} SHARED
-             "src/Data.cpp")
+add_library (${PROJECT_NAME}
+             src/Utils.cpp)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${PROJECT_VERSION})
 

@@ -3,73 +3,83 @@
 #set -x
 
 OUTDIR=../out/Data
-DB=${OUTDIR}/OpenGLTest.data
+DB=${OUTDIR}/ToyProject.data
 
 mkdir -p ${OUTDIR}
 
 rm -f ${DB}
 
 sqlite3 ${DB} << EOF
-CREATE TABLE Slot(Id INTEGER PRIMARY KEY AUTOINCREMENT, SlotId INTEGER, Name TEXT);
-CREATE TABLE Data(Id INTEGER PRIMARY KEY AUTOINCREMENT, SlotId INTEGER, Name TEXT, Data BLOB);
+CREATE TABLE Type(Id INTEGER PRIMARY KEY AUTOINCREMENT, Name TEXT);
+CREATE TABLE Slot(Id INTEGER PRIMARY KEY AUTOINCREMENT, Slot INTEGER, Name TEXT);
+CREATE TABLE Data(Id INTEGER PRIMARY KEY AUTOINCREMENT, Slot INTEGER, Type INTEGER, Name TEXT, Data BLOB);
 
-INSERT INTO Slot VALUES(0, -1, 'ROOT');
+INSERT INTO Type
+     VALUES(1,'Font'),
+	       (2,'Vertex Shader'),
+	       (3,'Fragment Shader');
+INSERT INTO Slot
+     VALUES(0, -1, ''); -- root
 EOF
 
-function GetSlotID() {
-  local SLOT=${1}
-  local BASE=0
-  local LEAF=`basename "${SLOT}"`
-  if [ "${LEAF}" != "${SLOT}" ];
-  then
-    DIR=`dirname "${SLOT}"`
-    BASE=`GetSlotID "${DIR}"`
-  fi
-  local ID=`sqlite3 ${DB} "SELECT Id FROM Slot WHERE SlotId = ${BASE} AND Name = '${LEAF}';"`
-  if [ -z ${ID} ]
-  then
-    ID=`sqlite3 ${DB} "INSERT INTO Slot VALUES(NULL,${BASE},'${LEAF}'); SELECT Id FROM Slot WHERE SlotId = ${BASE} AND Name = '${LEAF}';"`
-  fi
-  echo ${ID}
-}
+# the extensions which are stored
+declare -A ext=( ["ttf"]=1 
+                 ["otf"]=1
+				 ["vs"]=2
+				 ["fs"]=3)
 
 IFS='
 '
-for FILELIST in `find * -name filelist`
-do
-  BASE=`dirname ${FILELIST}`
+
+function ProcessFilelist() {
+  local FILELIST=${1}
+  local SLOT=${2}
+  local BASE=`dirname ${FILELIST}`
   for LINE in `cat ${FILELIST}`
   do
-    NAME=`echo ${LINE}|cut -d= -f 1|xargs`
-    FILE=${BASE}/`echo ${LINE}|cut -d= -f 2|xargs`
-    SLOT=`dirname "${FILE}"`
-    SLOTID=`GetSlotID ${SLOT}`
-    sqlite3 ${DB} << EOF
-INSERT INTO Data VALUES(NULL, ${SLOTID}, '${NAME}', ReadFile('${FILE}'));
-EOF
+    local NAME=`echo ${LINE}|cut -d= -f 1|xargs`
+    local FILE=${BASE}/`echo ${LINE}|cut -d= -f 2|xargs`
+	local EXT="${FILE##*.}"
+	if [[ -v "ext[${EXT}]" ]]
+	then
+  	  local TYPE=${ext[${EXT}]}
+	  echo "  Adding ${FILE} from ${FILELIST}"
+      sqlite3 ${DB} "INSERT INTO Data VALUES(NULL, ${SLOT}, ${TYPE}, '${NAME}', ReadFile('${FILE}'));"
+	else
+	  echo "Ignoring ${FILE} from ${FILELIST}"
+	fi
   done
-done
+}
 
+function ProcessDirectory() {
+  local DIR=${1}
+  local SLOT=${2}
+  if [ -e ${DIR}/filelist ]
+  then 
+    ProcessFilelist "${DIR}/filelist" ${SLOT}
+  else
+    for D in `find "${DIR}" -mindepth 1 -maxdepth 1 -type d`
+	do
+	  local LEAF=`basename ${D}`
+      local ID=`sqlite3 ${DB} "INSERT INTO Slot VALUES(NULL,${SLOT},'${LEAF}'); SELECT Id FROM Slot WHERE Slot = ${SLOT} AND Name = '${LEAF}';"`
+	  ProcessDirectory ${D} ${ID}
+	done
+    for F in `find "${DIR}" -mindepth 1 -maxdepth 1 -type f`
+	do
+	  local FILE=`basename ${F}`
+  	  local EXT="${FILE##*.}"
+	  if [[ -v "ext[${EXT}]" ]]
+	  then
+  	    local TYPE=${ext[${EXT}]}
+	    local NAME="${FILE%%.*}"
+	    echo "  Adding ${F}"
+        sqlite3 ${DB} "INSERT INTO Data VALUES(NULL, ${SLOT}, ${TYPE}, '${NAME}', ReadFile('${FILE}'));"
+  	  else
+	    echo "Ignoring ${F}"
+	  fi
+	done
+  fi
+}
 
-
-
-#sqlite3 ${OUTDIR}/OpenGLTest.data << EOF
-#CREATE TABLE Fonts(Id INTEGER, Name TEXT, Data BLOB);
-#
-#INSERT INTO Fonts
-#  (Id,Name,Data) 
-#VALUES
-#  ( 0, 'Comic Jens',       ReadFile('./fonts/comic-jens/ComicJensFreePro-Regular.ttf')), 
-#  ( 1, 'Exo Black Italic', ReadFile('./fonts/exo/Exo-Black-Italic.otf')), 
-#  ( 2, 'Exo Black',        ReadFile('./fonts/exo/Exo-Black.otf')), 
-#  ( 3, 'Exo Italic',       ReadFile('./fonts/exo/Exo-Regular-Italic.otf')), 
-#  ( 4, 'Exo',              ReadFile('./fonts/exo/Exo-Regular.otf')), 
-#  ( 5, 'Infini Bold',      ReadFile('./fonts/infini/infini-gras.otf')), 
-#  ( 6, 'Infini Italic',    ReadFile('./fonts/infini/infini-italique.otf')), 
-#  ( 7, 'Lobster',          ReadFile('./fonts/lobster/Lobster.otf')), 
-#  ( 8, 'Odin Bold Italic', ReadFile('./fonts/odin-rounded/Odin Rounded - Bold Italic.otf')), 
-#  ( 9, 'Odin Bold',        ReadFile('./fonts/odin-rounded/Odin Rounded - Bold.otf')), 
-#  (10, 'Pecita',           ReadFile('./fonts/pecita/Pecita.otf')), 
-#  (11, 'Prida',            ReadFile('./fonts/prida65/Prida65.otf'));
-#EOF
+ProcessDirectory "." 0
 

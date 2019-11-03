@@ -1,8 +1,4 @@
+Data to be used in the ToyProjects
 
-Database layout:
-
-Directories(id, parent, name)
-0, -1, ROOT  # special entry which all other directories are based on
-
-Files(id, directory, name, data)
-
+if a 'filelist' exists in a directory, it will not be examined any further and the directions
+in the filelist are followed.

@@ -19,5 +19,5 @@ protected:
 
 TEST_F(DataTest, Init)
 {
-    Data data("DataTest.data");
+    Data data("ToyProject.data");
 }
