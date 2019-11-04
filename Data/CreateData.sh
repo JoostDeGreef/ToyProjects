@@ -3,13 +3,20 @@
 #set -x
 
 OUTDIR=../out/Data
-DB=${OUTDIR}/ToyProject.data
+DBBASE=${OUTDIR}/ToyProjects
+SPLIT=12
+INDEX=0
+
+echo "Creating ${DBBASE}.xx.data"
 
 mkdir -p ${OUTDIR}
 
-rm -f ${DB}
+rm -f ${DBBASE}.*.data
 
-sqlite3 ${DB} << EOF
+for ID in `seq -f %02.0f 0 $(($SPLIT - 1))`
+do
+  DB=`echo ${DBBASE}.${ID}.data`
+  sqlite3 ${DB} << EOF
 CREATE TABLE Type(Id INTEGER PRIMARY KEY AUTOINCREMENT, Name TEXT);
 CREATE TABLE Slot(Id INTEGER PRIMARY KEY AUTOINCREMENT, Slot INTEGER, Name TEXT);
 CREATE TABLE Data(Id INTEGER PRIMARY KEY AUTOINCREMENT, Slot INTEGER, Type INTEGER, Name TEXT, Data BLOB);
@@ -21,12 +28,13 @@ INSERT INTO Type
 INSERT INTO Slot
      VALUES(0, -1, ''); -- root
 EOF
+done
 
 # the extensions which are stored
 declare -A ext=( ["ttf"]=1 
                  ["otf"]=1
-				 ["vs"]=2
-				 ["fs"]=3)
+                 ["vs"]=2
+                 ["fs"]=3)
 
 IFS='
 '
@@ -39,15 +47,18 @@ function ProcessFilelist() {
   do
     local NAME=`echo ${LINE}|cut -d= -f 1|xargs`
     local FILE=${BASE}/`echo ${LINE}|cut -d= -f 2|xargs`
-	local EXT="${FILE##*.}"
-	if [[ -v "ext[${EXT}]" ]]
-	then
-  	  local TYPE=${ext[${EXT}]}
-	  echo "  Adding ${FILE} from ${FILELIST}"
+    local EXT="${FILE##*.}"
+    if [[ -v "ext[${EXT}]" ]]
+    then
+      local TYPE=${ext[${EXT}]}
+      echo "  Adding ${FILE} from ${FILELIST}"
+      ID=`printf %02.0f ${INDEX}`
+      INDEX=$(($INDEX + 1))
+      DB=`echo ${DBBASE}.${ID}.data`
       sqlite3 ${DB} "INSERT INTO Data VALUES(NULL, ${SLOT}, ${TYPE}, '${NAME}', ReadFile('${FILE}'));"
-	else
-	  echo "Ignoring ${FILE} from ${FILELIST}"
-	fi
+    else
+      echo "Ignoring ${FILE} from ${FILELIST}"
+    fi
   done
 }
 
@@ -59,25 +70,25 @@ function ProcessDirectory() {
     ProcessFilelist "${DIR}/filelist" ${SLOT}
   else
     for D in `find "${DIR}" -mindepth 1 -maxdepth 1 -type d`
-	do
-	  local LEAF=`basename ${D}`
+    do
+      local LEAF=`basename ${D}`
       local ID=`sqlite3 ${DB} "INSERT INTO Slot VALUES(NULL,${SLOT},'${LEAF}'); SELECT Id FROM Slot WHERE Slot = ${SLOT} AND Name = '${LEAF}';"`
-	  ProcessDirectory ${D} ${ID}
-	done
+      ProcessDirectory ${D} ${ID}
+    done
     for F in `find "${DIR}" -mindepth 1 -maxdepth 1 -type f`
-	do
-	  local FILE=`basename ${F}`
-  	  local EXT="${FILE##*.}"
-	  if [[ -v "ext[${EXT}]" ]]
-	  then
-  	    local TYPE=${ext[${EXT}]}
-	    local NAME="${FILE%%.*}"
-	    echo "  Adding ${F}"
+    do
+      local FILE=`basename ${F}`
+      local EXT="${FILE##*.}"
+      if [[ -v "ext[${EXT}]" ]]
+      then
+        local TYPE=${ext[${EXT}]}
+        local NAME="${FILE%%.*}"
+        echo "  Adding ${F}"
         sqlite3 ${DB} "INSERT INTO Data VALUES(NULL, ${SLOT}, ${TYPE}, '${NAME}', ReadFile('${FILE}'));"
-  	  else
-	    echo "Ignoring ${F}"
-	  fi
-	done
+      else
+        echo "Ignoring ${F}"
+      fi
+    done
   fi
 }
 

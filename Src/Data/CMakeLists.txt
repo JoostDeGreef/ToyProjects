@@ -7,7 +7,7 @@ set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 link_libraries(SQLiteDB
                Utils
                boost
-			   Boost-FileSystem)
+               Boost-FileSystem)
 
 add_library (${PROJECT_NAME} SHARED
              "src/Data.cpp")
