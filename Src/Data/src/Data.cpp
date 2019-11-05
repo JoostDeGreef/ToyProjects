@@ -81,13 +81,13 @@ Data::Slot& Data::Slot::Add(std::string& name)
 
 Data::Blob& Data::Slot::Add(std::string& name, const int type, std::shared_ptr<Source>& source, const int id)
 {
-    auto iter = m_blobs.insert(name, type, Blob(source, id));
-    return iter;
+  auto blob = std::make_shared<Blob>(source, id);
+  m_blobs.emplace(name, type, blob);
+  return *blob;
 }
 
 void Data::AddBlobsFromSource(Slot & slot, std::shared_ptr<Source>& source, const int slotId)
 {
-
     auto& db = source->DB();
     auto q = db.ExecQuery("SELECT Id,Name FROM Slots WHERE Slot = '%1%'", slotId);
     for (; !q.IsEOF(); q.NextRow())

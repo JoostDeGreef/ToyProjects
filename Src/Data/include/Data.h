@@ -11,7 +11,7 @@
 class Data
 {
 public:
-    typedef std::vector<unsigned char> Bytes;
+    using Bytes = std::vector<unsigned char>;
 
     class Source
     {
@@ -36,18 +36,18 @@ public:
         int m_id;
     };
 
+    using Blobs = grid<std::string, int, std::shared_ptr<Blob>>;
+
     class Slot
     {
     public:
         using Slots = std::map<std::string, Slot>;
-        using Blobs = grid<std::string, int, std::shared_ptr<Blob>>;
-        using iterator = Blobs::iterator;
 
         const Slot& operator[] (const std::string& key) const;
 
         //iterator over files
-        iterator begin() const { return m_blobs.begin(); }
-        iterator end() const { return m_blobs.end(); }
+        auto begin() const { return m_blobs.begin(); }
+        auto end() const { return m_blobs.end(); }
 
         Slot& Add(std::string& name);
         Blob& Add(std::string& name, const int type, std::shared_ptr<Source>& source, const int id);
@@ -75,7 +75,6 @@ private:
     void AddBlobsFromSource(Slot & slot, std::shared_ptr<Source>& source, const int slotId = 0);
 
     Slot m_root;
-    std::multimap<std::string, std::tuple<std::string, Blob*>> m_blobsByName;
-    std::map<std::string, std::map<std::string, Blob*>> m_blobsByTypeByName;
+    Blobs m_blobs;
 };
 
