@@ -8,6 +8,132 @@
 #include <algorithm>
 #include <ostream>
 #include <sstream>
+#include <cassert>
+#include <vector>
+#include <unordered_set>
+
+template<std::size_t N, typename ROW, std::size_t... I>
+class grid_tuple
+{
+public:
+  using next = grid_tuple<N-1,ROW,N-1,I...>;
+  using type = typename next::type;
+  
+  static void clear(type & t)
+  {
+    std::get<N-1>(t).clear();
+    next::clear(t);
+  }
+  static void insert(type & t, ROW * row)
+  {
+    std::get<N-1>(t).emplace(row);
+    next::insert(t,row);
+  }
+  static void to_stream(std::ostream& s, const ROW * row)
+  {
+    next::to_stream(s, row);
+    s << ((N>1)?",":"") << std::get<N-1>(*row);
+  }
+};
+template<typename ROW, std::size_t... I>
+class grid_tuple<0, ROW, I...>
+{
+public:
+  template <int INDEX>
+  class grid_element
+  {
+  public:
+    using type = typename std::tuple_element<INDEX, ROW>::type;
+    grid_element(ROW * row)
+        : m_row(row)
+        , m_key(nullptr)
+    {}
+    grid_element(type * key)
+        : m_row(nullptr)
+        , m_key(key)
+    {}
+    ~grid_element()
+    {
+      if(INDEX==0)
+      {
+        delete m_row;
+      }
+    }
+    bool operator == (const grid_element<INDEX> & other) const
+    {
+      return **this == *other;
+    }
+    const type & operator * () const
+    {
+      return std::get<INDEX>(*m_row);
+    }
+    auto & operator * ()
+    {
+      return m_row ? std::get<INDEX>(*m_row) : *m_key;
+    }
+    ROW * raw() const 
+    {
+      return m_row;
+    }
+  private:
+    ROW * m_row;
+    type * m_key;
+  };
+
+  class grid_hash
+  {
+  public:
+    template<typename ELEMENT>
+    auto operator() (const ELEMENT & element) const
+    {
+      return std::hash<typename ELEMENT::type>()(*element);
+    }
+  };
+
+  class grid_equal
+  {
+  public:
+    template<typename T0,typename T1>
+    bool operator() (const T0 & t0, const T1 & t1) const
+    {
+       return t0 == t1;
+    }
+  };
+
+  using type = typename std::tuple<std::unordered_multiset<grid_element<I>,grid_hash,grid_equal>...>;
+  
+  static void clear(type&)
+  {}
+  static void insert(type &, ROW *)
+  {}
+  static void to_stream(std::ostream&, const ROW *)
+  {}
+};
+
+template <typename ... TYPES>
+class grid_applicator
+{
+public:
+  const static size_t column_count = sizeof...(TYPES);
+  using row_type = std::tuple<TYPES...>;
+  using grid_type = grid_tuple<sizeof...(TYPES), row_type>;
+  using data_type = typename grid_tuple<sizeof...(TYPES), row_type>::type;
+  
+  static void insert(data_type & data, row_type * row)
+  {
+    grid_type::insert(data,row);
+  }
+  
+  static void clear(data_type & data)
+  {
+    grid_type::clear(data);
+  }
+  
+  static void to_stream(std::ostream& s, const row_type * row)
+  {
+    grid_type::to_stream(s, row);
+  }
+};
 
 template <typename TYPE,typename ... TYPES>
 class grid
@@ -15,18 +141,95 @@ class grid
 public:
     const static size_t column_count = sizeof...(TYPES) + 1;
     using this_type = grid<TYPE, TYPES...>;
-    using row_type = std::tuple<TYPE, TYPES...>;
-    using hash_type = decltype(std::hash<void*>()(nullptr));
-    class node_type
+    using applicator = grid_applicator<TYPE, TYPES...>;
+    using row_type = typename applicator::row_type;
+    using data_type = typename applicator::data_type;
+//    using hash_type = decltype(std::hash<void*>()(nullptr));
+//    using grid_type = typename applicator::grid_type;
+//    using grid_element = typename grid_type::grid_element;
+    
+public:
+    ~grid()
     {
-    public:
-        node_type* m_next;
-        node_type* m_prev;
-        hash_type m_hash;
-        const row_type* m_row;
-    };
-    using index_type = std::vector<node_type*>;
+        clear();
+    }
 
+    grid()
+        : m_data()
+    {}
+
+    grid(const this_type& other)
+        : m_data(other.m_data)
+    {}
+
+    grid(const std::initializer_list<row_type>& values)
+        : grid()
+    {
+        for (const auto& value : values)
+        {
+            auto p = new row_type(value);
+            applicator::insert(m_data,p);
+        }
+    }
+
+    size_t size()
+    {
+      return std::get<0>(m_data).size();
+    }
+    
+    void clear()
+    {
+      applicator::clear(m_data);
+    }
+    
+    void emplace(TYPE t0, TYPES... ts)
+    {
+      auto p = new row_type(t0, ts...);
+      applicator::insert(m_data,p);
+    }
+
+    template<int INDEX>
+    auto find(const typename std::tuple_element<INDEX, row_type>::type & key) const
+    {
+      auto t = key;
+      auto &s = std::get<INDEX>(m_data);
+      auto iter = s.find(&t);
+      return iter == s.end() ? nullptr : iter->raw();
+    }
+    
+    std::ostream& to_stream(std::ostream& s) const
+    {
+        s << "{";
+        bool first = true;
+        for (const auto& row : std::get<0>(m_data))
+        {
+            if (first)
+            {
+                first = false;
+            }
+            else
+            {
+                s << ",";
+            }
+            s << "{";
+            applicator::to_stream(s, row.raw());
+            s << "}";
+        }
+        s << "}";
+        return s;
+    }
+
+private:
+    data_type m_data;
+};
+    
+template<typename ... TYPES>
+std::ostream& operator << (std::ostream& s, const grid<TYPES...>& g)
+{
+    return g.to_stream(s);
+}
+
+/*  
 protected:
     template<size_t I>
     static void delete_node(const node_type* node)
@@ -435,15 +638,6 @@ public:
     };
 
 private:
-    template<size_t N, typename... D>
-    struct column_seq : column_seq<N - 1, typename column_type<N>, D...>
-    {
-    };
-    template<typename... D>
-    struct column_seq<0, D...>
-    {
-        using type = std::tuple<typename column_type<0>, D...>;
-    };
     using columns_type = typename column_seq<column_count - 1>::type;
     columns_type m_columns;
 
@@ -588,32 +782,4 @@ public:
         return c.end();
     }
 
-    std::ostream& to_stream(std::ostream& s) const
-    {
-        s << "{";
-        bool first = true;
-        for (const auto& row : std::get<0>(m_columns))
-        {
-            if (first)
-            {
-                first = false;
-            }
-            else
-            {
-                s << ",";
-            }
-            s << "{";
-            applicator<>::to_stream(s, row);
-            s << "}";
-        }
-        s << "}";
-        return s;
-    }
-};
-
-template<typename ... TYPES>
-std::ostream& operator << (std::ostream& s, const grid<TYPES...>& g)
-{
-    return g.to_stream(s);
-}
-
+*/

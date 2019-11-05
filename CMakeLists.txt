@@ -3,7 +3,7 @@ cmake_minimum_required (VERSION 3.9)
 # These are just toy projects, make that clear
 project ("ToyProjects" VERSION 0.0.1)
 
-SET( CMAKE_CXX_STANDARD 14 )
+SET( CMAKE_CXX_STANDARD 17 )
 SET( CMAKE_CXX_STANDARD_REQUIRED ON )
 
 set( CMAKE_INSTALL_RPATH "${ORIGIN}" )
