@@ -19,8 +19,9 @@ protected:
 
 TEST_F(DataTest, Init)
 {
-    Data data("ToyProjects.00.data","ToyProjects.01.data","ToyProjects.02.data","ToyProjects.03.data",
-              "ToyProjects.04.data","ToyProjects.05.data","ToyProjects.06.data","ToyProjects.07.data",
-              "ToyProjects.08.data","ToyProjects.09.data","ToyProjects.10.data","ToyProjects.11.data");
-//    data.;
+    Data data{ "ToyProjects.00.data","ToyProjects.01.data","ToyProjects.02.data","ToyProjects.03.data",
+               "ToyProjects.04.data","ToyProjects.05.data","ToyProjects.06.data","ToyProjects.07.data",
+               "ToyProjects.08.data","ToyProjects.09.data","ToyProjects.10.data"  };
+    data.AddDataPath("ToyProjects.11.data");
+    auto textShader = data["shaders"].GetShader("Text");
 }

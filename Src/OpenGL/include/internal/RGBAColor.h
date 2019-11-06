@@ -5,7 +5,7 @@
 namespace OpenGL
 {
     template<typename VALUE_TYPE>
-    class TRGBAColor 
+    class TRGBAColor
     {
     public:
         typedef TRGBAColor<VALUE_TYPE> this_type;
@@ -17,11 +17,11 @@ namespace OpenGL
     public:
         TRGBAColor()
         {}
-        TRGBAColor(const this_type &other)
+        TRGBAColor(const this_type& other)
         {
             Copy(other);
         }
-        TRGBAColor(const value_type &r, const value_type &g, const value_type &b, const value_type &a)
+        TRGBAColor(const value_type& r, const value_type& g, const value_type& b, const value_type& a)
         {
             Set(r, g, b, a);
         }
@@ -30,11 +30,11 @@ namespace OpenGL
             SetInt(color);
         }
 
-        void SetR(const value_type &r) { m_data[0] = r; }
-        void SetG(const value_type &g) { m_data[1] = g; }
-        void SetB(const value_type &b) { m_data[2] = b; }
-        void SetA(const value_type &a) { m_data[3] = a; }
-        void Set(const value_type &r, const value_type &g, const value_type &b, const value_type &a)
+        void SetR(const value_type& r) { m_data[0] = r; }
+        void SetG(const value_type& g) { m_data[1] = g; }
+        void SetB(const value_type& b) { m_data[2] = b; }
+        void SetA(const value_type& a) { m_data[3] = a; }
+        void Set(const value_type& r, const value_type& g, const value_type& b, const value_type& a)
         {
             m_data[0] = r;
             m_data[1] = g;
@@ -42,7 +42,7 @@ namespace OpenGL
             m_data[3] = a;
         }
 
-        void Copy(const this_type &other)
+        void Copy(const this_type& other)
         {
             m_data[0] = other.m_data[0];
             m_data[1] = other.m_data[1];
@@ -50,13 +50,13 @@ namespace OpenGL
             m_data[3] = other.m_data[3];
         }
 
-        this_type Mix(const this_type & other)
+        this_type Mix(const this_type& other)
         {
             return this_type(
-                (value_type)0.5*(m_data[0] + other.m_data[0]),
-                (value_type)0.5*(m_data[1] + other.m_data[1]),
-                (value_type)0.5*(m_data[2] + other.m_data[2]),
-                (value_type)0.5*(m_data[3] + other.m_data[3]));
+                (value_type)0.5 * (m_data[0] + other.m_data[0]),
+                (value_type)0.5 * (m_data[1] + other.m_data[1]),
+                (value_type)0.5 * (m_data[2] + other.m_data[2]),
+                (value_type)0.5 * (m_data[3] + other.m_data[3]));
         }
 
         const value_type& GetR() const { return m_data[0]; }
@@ -68,16 +68,16 @@ namespace OpenGL
         const unsigned int GetInt() const
         {
             return (Value::ToByte(m_data[0]) << 24)
-                 + (Value::ToByte(m_data[1]) << 16)
-                 + (Value::ToByte(m_data[2]) << 8)
-                 + (Value::ToByte(m_data[3]));
+                + (Value::ToByte(m_data[1]) << 16)
+                + (Value::ToByte(m_data[2]) << 8)
+                + (Value::ToByte(m_data[3]));
         }
         void SetInt(unsigned int color)
         {
             m_data[0] = Value::FromByte((color >> 24) & 255);
             m_data[1] = Value::FromByte((color >> 16) & 255);
-            m_data[2] = Value::FromByte((color >>  8) & 255);
-            m_data[3] = Value::FromByte((color      ) & 255);
+            m_data[2] = Value::FromByte((color >> 8) & 255);
+            m_data[3] = Value::FromByte((color) & 255);
         }
 
         //void Serialize(Common::Serializer& s) const
@@ -93,7 +93,7 @@ namespace OpenGL
         //    return res;
         //}
 
-        bool operator == (const this_type &other) const
+        bool operator == (const this_type& other) const
         {
             return
                 m_data[0] == other.m_data[0] &&
@@ -103,11 +103,11 @@ namespace OpenGL
         }
 
         static           this_type Random() { return this_type(Value::Rnd(), Value::Rnd(), Value::Rnd(), Value::Hi()); }
-        static constexpr this_type Black()  { return this_type(Value::Lo(), Value::Lo(), Value::Lo(), Value::Hi()); }
-        static constexpr this_type Blue()   { return this_type(Value::Lo(), Value::Lo(), Value::Hi(), Value::Hi()); }
-        static constexpr this_type Green()  { return this_type(Value::Lo(), Value::Hi(), Value::Lo(), Value::Hi()); }
-        static constexpr this_type Red()    { return this_type(Value::Hi(), Value::Lo(), Value::Lo(), Value::Hi()); }
-        static constexpr this_type White()  { return this_type(Value::Hi(), Value::Hi(), Value::Hi(), Value::Hi()); }
+        static constexpr this_type Black() { return this_type(Value::Lo(), Value::Lo(), Value::Lo(), Value::Hi()); }
+        static constexpr this_type Blue() { return this_type(Value::Lo(), Value::Lo(), Value::Hi(), Value::Hi()); }
+        static constexpr this_type Green() { return this_type(Value::Lo(), Value::Hi(), Value::Lo(), Value::Hi()); }
+        static constexpr this_type Red() { return this_type(Value::Hi(), Value::Lo(), Value::Lo(), Value::Hi()); }
+        static constexpr this_type White() { return this_type(Value::Hi(), Value::Hi(), Value::Hi(), Value::Hi()); }
     private:
 
         using Value = TColorValue<value_type>;

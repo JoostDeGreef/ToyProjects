@@ -2,48 +2,48 @@
 
 #include "glad/glad.h"
 
-void OpenGL::glColor(const RGBAColorf & color)
+void OpenGL::glColor(const RGBAColorf& color)
 {
     glColor4fv(color.GetRGBA());
 }
-void OpenGL::glColor(const RGBAColord & color)
+void OpenGL::glColor(const RGBAColord& color)
 {
     glColor4dv(color.GetRGBA());
 }
 
-void OpenGL::glColor(const RGBColorf & color)
+void OpenGL::glColor(const RGBColorf& color)
 {
     glColor3fv(color.GetRGB());
 }
-void OpenGL::glColor(const RGBColord & color)
+void OpenGL::glColor(const RGBColord& color)
 {
     glColor3dv(color.GetRGB());
 }
 
-void OpenGL::glVertex(const Vector3f & point)
+void OpenGL::glVertex(const Vector3f& point)
 {
     glVertex3fv(point.GetData());
 }
-void OpenGL::glVertex(const Vector3d & point)
+void OpenGL::glVertex(const Vector3d& point)
 {
     glVertex3dv(point.GetData());
 }
 
 void OpenGL::glVertex(const double& x, const double& y)
 {
-    glVertex2d(x,y);
+    glVertex2d(x, y);
 }
 void OpenGL::glVertex(const float& x, const float& y)
 {
-    glVertex2f(x,y);
+    glVertex2f(x, y);
 }
 
-void OpenGL::glNormal(const Vector3f & normal)
+void OpenGL::glNormal(const Vector3f& normal)
 {
     glNormal3fv(normal.GetData());
 }
 
-void OpenGL::glNormal(const Vector3d & normal)
+void OpenGL::glNormal(const Vector3d& normal)
 {
     glNormal3dv(normal.GetData());
 }

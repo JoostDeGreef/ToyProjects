@@ -10,7 +10,7 @@ using namespace Viewer;
 
 namespace
 {
-    static const char * const textVertexShader = R"VertexShader(
+    static const char* const textVertexShader = R"VertexShader(
 #version 440
 
 void main()
@@ -20,7 +20,7 @@ void main()
 }
 )VertexShader";
 
-    static const char * const textFragmentShader = R"FragmentShader(
+    static const char* const textFragmentShader = R"FragmentShader(
 #version 440
 
 uniform sampler2D texture;
@@ -35,7 +35,7 @@ void main()
 
 
 
-    GLuint LoadShaders(const char * const vertex, const char * const fragment) {
+    GLuint LoadShaders(const char* const vertex, const char* const fragment) {
 
         // Create the shaders
         GLuint vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
@@ -50,7 +50,7 @@ void main()
             if (infoLogLength > 0) {
                 std::vector<char> errorMessage(infoLogLength + 1);
                 glGetShaderInfoLog(shaderID, infoLogLength, NULL, &errorMessage[0]);
-                return std::string(errorMessage.begin(),errorMessage.end());
+                return std::string(errorMessage.begin(), errorMessage.end());
             }
             return std::string();
         };
@@ -97,7 +97,7 @@ void main()
         int infoLogLength;
         glGetProgramiv(programID, GL_LINK_STATUS, &result);
         glGetProgramiv(programID, GL_INFO_LOG_LENGTH, &infoLogLength);
-        if (infoLogLength > 0) 
+        if (infoLogLength > 0)
         {
             std::vector<char> errorMessage(infoLogLength + 1);
             glGetProgramInfoLog(programID, infoLogLength, NULL, &errorMessage[0]);
@@ -123,7 +123,7 @@ Shaders::Type Shaders::Select(Type shader)
 
     if (shaders.m_selected != shader)
     {
-        auto AddAndSelectShader = [&](Type shader, const char * const vertex, const char * const fragment)
+        auto AddAndSelectShader = [&](Type shader, const char* const vertex, const char* const fragment)
         {
             GLuint programId = LoadShaders(vertex, fragment);
             if (programId == 0)
@@ -161,11 +161,11 @@ Shaders::Type Shaders::Select(Type shader)
     return prev;
 }
 
-int Shaders::GetUniformLocation(const char * const name)
+int Shaders::GetUniformLocation(const char* const name)
 {
     // store this value?
     auto iter = shaders.m_shaders.find(shaders.m_selected);
     assert(iter != shaders.m_shaders.end());
-    return glGetUniformLocation(iter->second,name);
+    return glGetUniformLocation(iter->second, name);
 }
 

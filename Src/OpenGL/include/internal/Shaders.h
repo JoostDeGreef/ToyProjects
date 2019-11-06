@@ -14,7 +14,7 @@ namespace Viewer
         Shaders();
 
         static Type Select(Type shader);
-        static int GetUniformLocation(const char * const name);
+        static int GetUniformLocation(const char* const name);
     private:
         Type m_selected;
         std::map<Type, unsigned int> m_shaders;

@@ -16,12 +16,12 @@ class FreeType
 public:
     FreeType()
     {
-        if (FT_Init_FreeType(&m_ft) != 0) 
+        if (FT_Init_FreeType(&m_ft) != 0)
         {
-// todo: exception?
-//            fprintf(stderr, "Could not init freetype library\n");
-//            return 1;
-        }        
+            // todo: exception?
+            //            fprintf(stderr, "Could not init freetype library\n");
+            //            return 1;
+        }
     }
 
     ~FreeType()
@@ -29,7 +29,7 @@ public:
         FT_Done_FreeType(m_ft);
     }
 
-    operator FT_Library&() { return m_ft; }
+    operator FT_Library& () { return m_ft; }
 
 private:
     FT_Library m_ft;
@@ -38,16 +38,16 @@ private:
 class FreeTypeFont
 {
 public:
-    FreeTypeFont(const std::string& fontName,const unsigned int size)
+    FreeTypeFont(const std::string& fontName, const unsigned int size)
     {
         // todo: create a 'data' class?
         m_data = Data::GetFont(fontName);
         //if (FT_New_Face(m_ft, fontfile.c_str(), 0, &m_face) != 0) 
         if (FT_New_Memory_Face(m_ft, m_data.data(), (FT_Long)m_data.size(), (FT_Long)0, &m_face) != 0)
         {
-// todo: exception?
-//            fprintf(stderr, "Could not open font\n");
-//            return 1;
+            // todo: exception?
+            //            fprintf(stderr, "Could not open font\n");
+            //            return 1;
         }
         FT_Set_Pixel_Sizes(m_face, 0, size);
     }
@@ -56,7 +56,7 @@ public:
         FT_Done_Face(m_face);
     }
 
-    operator FT_Face&() { return m_face; }
+    operator FT_Face& () { return m_face; }
 
 private:
     static FreeType m_ft;
@@ -70,10 +70,10 @@ class Character
 {
 public:
     Character(const char c,
-              const int width, const int height,
-              const int left, const int top,
-              const int advance_x, const int advance_y,
-              const int bearing_x, const int bearing_y)
+        const int width, const int height,
+        const int left, const int top,
+        const int advance_x, const int advance_y,
+        const int bearing_x, const int bearing_y)
         : m_char(c)
         , m_width(width)
         , m_height(height)
@@ -117,24 +117,24 @@ private:
 class CharacterMap
 {
 public:
-    CharacterMap(const std::string& fontName,const unsigned int size)
+    CharacterMap(const std::string& fontName, const unsigned int size)
         : m_characters()
         , m_textureId(0)
     {
         FreeTypeFont font(fontName, size);
         LoadCharacters(font,
-                       " "
-                       "0123456789"
-                       "abcdefghijklmnopqrstuvwxyz"
-                       "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                       "!@#$%^&*()-_=+`~[]{};:'\"\\|,.<>/?");
+            " "
+            "0123456789"
+            "abcdefghijklmnopqrstuvwxyz"
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            "!@#$%^&*()-_=+`~[]{};:'\"\\|,.<>/?");
     }
 
     void RenderText(const std::string& text, double x, double y, double scale_x, double scale_y, Geometry::Color& color)
     {
         Shaders::Type prevShader = Shaders::Select(Shaders::Type::Text);
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, m_textureId); 
+        glBindTexture(GL_TEXTURE_2D, m_textureId);
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -149,7 +149,7 @@ public:
         glUniform4fv(inputColorLocation, 1, color.GetRGBA());
 
         glBegin(GL_TRIANGLES);
-        for (const char c: text)
+        for (const char c : text)
         {
             const Character& character = GetCharacter(c);
 
@@ -204,7 +204,7 @@ public:
 
             y = std::max(y, h);
         }
-        Geometry::Vector2d res(x,y);
+        Geometry::Vector2d res(x, y);
         return res;
     }
 
@@ -216,11 +216,11 @@ protected:
         int64_t surface = 0;
         std::vector<Character> characters;
 
-        for (char c: chars) 
+        for (char c : chars)
         {
-            if (0 != FT_Load_Char(face, c, FT_LOAD_RENDER)) 
+            if (0 != FT_Load_Char(face, c, FT_LOAD_RENDER))
             {
-//                fprintf(stderr, "Loading character %c failed!\n", i);
+                //                fprintf(stderr, "Loading character %c failed!\n", i);
                 continue;
             }
             surface += g->bitmap.width * g->bitmap.rows;
@@ -228,13 +228,13 @@ protected:
         }
 
         // sort the glyps with the tallest ones in front
-        sort(characters.begin(), characters.end(), [](Character& a, Character& b) 
-        { 
-            return a.GetHeight() == b.GetHeight() ? a.GetWidth() > b.GetWidth() : a.GetHeight() > b.GetHeight();
-        });
+        sort(characters.begin(), characters.end(), [](Character& a, Character& b)
+            {
+                return a.GetHeight() == b.GetHeight() ? a.GetWidth() > b.GetWidth() : a.GetHeight() > b.GetHeight();
+            });
 
         // see how big the (square) texture should be to contain all glyphs.
-        int side = (int)pow(2, ceil(log2(sqrt(surface)/2)));
+        int side = (int)pow(2, ceil(log2(sqrt(surface) / 2)));
         int height;
         do
         {
@@ -244,7 +244,7 @@ protected:
             int y = 0;
             for (Character& c : characters)
             {
-                if (c.GetWidth() + x + 2> side)
+                if (c.GetWidth() + x + 2 > side)
                 {
                     x = 0;
                 }
@@ -253,11 +253,10 @@ protected:
                     y = height;
                     height += c.GetHeight() + 2;
                 }
-                c.SetTexturePos(x+1,y+1);
+                c.SetTexturePos(x + 1, y + 1);
                 x += c.GetWidth() + 2;
             }
-        }
-        while (height>side);
+        } while (height > side);
 
         // create the texture
         glActiveTexture(GL_TEXTURE0);
@@ -326,8 +325,8 @@ CharacterMap& GetCharacterMap(const std::string& fontName, const unsigned int si
 Font::Font(std::string&& fontName, const int size)
     : m_fontName(std::move(fontName))
     , m_size(size)
-    , m_pixelSize(1/800)
-    , m_color(1,1,1,1)
+    , m_pixelSize(1 / 800)
+    , m_color(1, 1, 1, 1)
 {}
 
 Font& Font::PixelSize(const double pixelSize)
