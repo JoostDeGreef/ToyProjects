@@ -74,12 +74,12 @@ const Data::Slot& Data::Slot::operator[] (const std::string& key) const
     return iter->second;
 }
 
-Data::Slot& Data::Slot::Add(std::string& name)
+Data::Slot& Data::Slot::Add(const std::string& name)
 {
     return m_slots[name];
 }
 
-Data::Blob& Data::Slot::Add(std::string& name, const int type, std::shared_ptr<Source>& source, const int id)
+Data::Blob& Data::Slot::Add(const std::string& name, const int type, const std::shared_ptr<Source>& source, const int id)
 {
   auto blob = std::make_shared<Blob>(source, id);
   m_blobs.emplace(name, type, blob);
@@ -89,7 +89,7 @@ Data::Blob& Data::Slot::Add(std::string& name, const int type, std::shared_ptr<S
 void Data::AddBlobsFromSource(Slot & slot, std::shared_ptr<Source>& source, const int slotId)
 {
     auto& db = source->DB();
-    auto q = db.ExecQuery("SELECT Id,Name FROM Slots WHERE Slot = '%1%'", slotId);
+    auto q = db.ExecQuery("SELECT Id,Name FROM Slot WHERE Slot = '%1%'", slotId);
     for (; !q.IsEOF(); q.NextRow())
     {
         int id = q.GetIntField(0);

@@ -2,8 +2,11 @@
 
 #include <vector>
 #include <map>
+#include <set>
+#include <iostream>
 #include <boost/filesystem.hpp>
 #include <boost/optional.hpp>
+#include <boost/dll.hpp>
 
 #include "SQLiteDB.h"
 #include "grid.h"
@@ -26,8 +29,8 @@ public:
     class Blob
     {
     public:
-        Blob(std::shared_ptr<Source>& source, int id)
-            : m_source(std::move(source))
+        Blob(const std::shared_ptr<Source>& source, int id)
+            : m_source(source)
             , m_id(id)
         {}
         Bytes Get() const { return m_source->GetBlob(m_id); }
@@ -49,8 +52,8 @@ public:
         auto begin() const { return m_blobs.begin(); }
         auto end() const { return m_blobs.end(); }
 
-        Slot& Add(std::string& name);
-        Blob& Add(std::string& name, const int type, std::shared_ptr<Source>& source, const int id);
+        Slot& Add(const std::string& name);
+        Blob& Add(const std::string& name, const int type, const std::shared_ptr<Source>& source, const int id);
     private:
         Slots m_slots;
         Blobs m_blobs;
@@ -59,10 +62,17 @@ public:
     template<typename ...Paths>
     Data(Paths& ...datapaths)
     {
-        std::vector<boost::filesystem::path> dataPaths{ datapaths... };
-        for (const auto& datapath : dataPaths)
+        std::vector<boost::filesystem::path> datapaths_vector{ datapaths... };
+        std::set<boost::filesystem::path> datapaths_set;
+        auto exe_path = boost::dll::program_location().parent_path();
+        for (const auto & path : datapaths_vector)
         {
-            AddDataPath(datapath);
+          const auto full_path = boost::filesystem::canonical(path.is_relative() ? exe_path / path : path);
+          datapaths_set.insert(full_path);
+        }
+        for (const auto& datapath : datapaths_set)
+        {
+          AddDataPath(datapath);
         }
     }
 
