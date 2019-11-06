@@ -18,7 +18,7 @@ Data::Source::Source(const boost::filesystem::path& path)
 
 Data::Bytes Data::Source::GetBlob(const int id)
 {
-    auto q = m_db.ExecQuery("SELECT Data FROM Blobs WHERE Id = '%1%' LIMIT 1", id);
+    auto q = m_db.ExecQuery("SELECT Data FROM Data WHERE Id = '%1%' LIMIT 1", id);
     if (!q.IsEOF())
     {
         return q.GetBlobField(0);
@@ -33,11 +33,15 @@ Data::Bytes Data::Source::GetBlob(const int id)
 Data::Bytes Data::Slot::GetFont(std::string name) const
 {
     Data::lowercase(name);
+    return m_blobs.find<0,1>(name,1)->get<2>()->Get();
 }
 
 std::pair<Data::Bytes, Data::Bytes> Data::Slot::GetShader(std::string name) const
 {
     Data::lowercase(name);
+    return std::make_pair(
+        m_blobs.find<0, 1>(name, 2)->get<2>()->Get(),
+        m_blobs.find<0, 1>(name, 3)->get<2>()->Get());
 }
 
 const Data::Slot& Data::Slot::operator[] (std::string key) const

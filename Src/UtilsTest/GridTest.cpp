@@ -81,6 +81,8 @@ TEST_F(GridTest, Find)
     const int i0 = g1.find<0>(2)->get<1>();
     const int i1 = g1.find<1>(22)->get<1>();
     ASSERT_EQ(i0, i1);
+    const int i2 = g1.find<0,1>(2,22)->get<1>();
+    ASSERT_EQ(i0, i2);
 }
 
 TEST_F(GridTest, ToString)

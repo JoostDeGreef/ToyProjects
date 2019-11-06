@@ -253,7 +253,7 @@ public:
     template< size_t I, size_t J>
     const auto& get(const typename std::tuple_element<I, row_type>::type& key) const
     {
-        return get<J>(*find<I>(key)->row());
+        return std::get<J>(*find<I>(key)->row());
     }
 
     // find the first row with a value in a column (iterator to grid element)
@@ -261,6 +261,17 @@ public:
     auto find(const typename std::tuple_element<INDEX, row_type>::type& key) const
     {
         return std::get<INDEX>(m_data).find(grid_element<INDEX>(key));
+    }
+    template<int I0,int I1>
+    auto find(const typename std::tuple_element<I0, row_type>::type& key0,
+              const typename std::tuple_element<I1, row_type>::type& key1) const
+    {
+        auto iters = find_all<I0>(key0);
+        auto iter = std::find_if(std::get<0>(iters), std::get<1>(iters), [&key1](const grid_element<I0> & element)
+            {
+                return key1 == element.get<I1>();
+            });
+        return iter == std::get<1>(iters) ? end<I0>() : iter;
     }
 
     // find all rows with a value in a column (iterator to begin/end grid element)
