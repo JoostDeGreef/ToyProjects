@@ -94,11 +94,11 @@ public:
       assert(m_usage != Usage::Key);
       return m_row;
     }
-    template<int INDEX>
+    template<int INDEX2>
     const auto& get() const
     {
       assert(m_usage != Usage::Key);
-      return std::get<INDEX>(*m_row);
+      return std::get<INDEX2>(*m_row);
     }
   private:
     Usage m_usage;
@@ -147,7 +147,7 @@ class grid_applicator
 public:
   const static size_t column_count = sizeof...(TYPES);
   using row_type = std::tuple<TYPES...>;
-  using grid_type = typename grid_tuple<sizeof...(TYPES), row_type>;
+  using grid_type = grid_tuple<sizeof...(TYPES), row_type>;
   using data_type = typename grid_type::type;
   template<int INDEX>
   using grid_element = typename grid_type::template grid_element<INDEX>;
@@ -253,7 +253,7 @@ public:
   template< size_t I, size_t J>
   const auto& get(const typename std::tuple_element<I, row_type>::type& key) const
   {
-    return find<I>(key)->get<J>();
+    return get<J>(*find<I>(key)->row());
   }
 
   // find the first row with a value in a column (iterator to grid element)
