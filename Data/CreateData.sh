@@ -80,7 +80,7 @@ function ProcessDirectoryContents() {
         echo "  Adding ${F}"
         UpdateDB
         FILEID=$(($FILEID + 1))
-        sqlite3 ${DB} "INSERT INTO Data VALUES(${FILEID}, ${SLOT}, ${TYPE}, '${NAME}', ReadFile('${FILE}'));"
+        sqlite3 ${DB} "INSERT INTO Data VALUES(${FILEID}, ${SLOT}, ${TYPE}, '${NAME}', ReadFile('${F}'));"
       else
         echo "Ignoring ${F}"
       fi

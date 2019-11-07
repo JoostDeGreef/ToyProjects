@@ -22,6 +22,7 @@ public:
     public:
         Source(const boost::filesystem::path& path);
         Bytes GetBlob(const int id);
+        std::string GetName(const int id);
         auto& DB() { return m_db; }
     private:
         SQLite::DB m_db;
@@ -37,6 +38,7 @@ public:
             , m_id(id)
         {}
         Bytes Get() const { return m_source.GetBlob(m_id); }
+        std::string Name() const { return m_source.GetName(m_id); }
     private:
         Source& m_source;
         int m_id;
@@ -59,7 +61,7 @@ public:
         std::pair<Bytes, Bytes> GetShader(std::string name) const;
 
         Slot& Add(std::string name);
-        Blob& Add(std::string name, const int type, Source& source, const int id);
+        std::shared_ptr<Blob> Add(std::string name, const int type, Source& source, const int id);
     private:
         Slots m_slots;
         Blobs m_blobs;

@@ -24,6 +24,10 @@ TEST_F(DataTest, Init)
                "ToyProjects.08.data","ToyProjects.09.data","ToyProjects.10.data"  };
     data.AddDataPath("ToyProjects.11.data");
     auto textShader = data["shaders"].GetShader("Text");
-    ASSERT_FALSE(textShader.first.empty());
-    ASSERT_FALSE(textShader.second.empty());
+    EXPECT_FALSE(textShader.first.empty());
+    EXPECT_FALSE(textShader.second.empty());
+    for(const auto& item : data["shaders"])
+    {
+      SUCCEED() << item.get<0>() << "," << item.get<1>();
+    }
 }

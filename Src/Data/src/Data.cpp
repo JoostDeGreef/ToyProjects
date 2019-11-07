@@ -2,6 +2,7 @@
 #include <unordered_map>
 #include <algorithm>
 #include <memory>
+#include <iostream>
 using namespace std;
 
 #include <boost/dll.hpp>
@@ -22,6 +23,20 @@ Data::Bytes Data::Source::GetBlob(const int id)
     if (!q.IsEOF())
     {
         return q.GetBlobField(0);
+    }
+    else
+    {
+        // todo: throw error?
+        return {};
+    }
+}
+
+std::string Data::Source::GetName(const int id)
+{
+    auto q = m_db.ExecQuery("SELECT Name FROM Data WHERE Id = '%1%' LIMIT 1", id);
+    if (!q.IsEOF())
+    {
+        return q.GetStringField(0);
     }
     else
     {
@@ -62,12 +77,13 @@ Data::Slot& Data::Slot::Add(std::string name)
     return m_slots[name];
 }
 
-Data::Blob& Data::Slot::Add(std::string name, const int type, Source& source, const int id)
+// todo make this a reference after grid.emplace returns the inserted item
+std::shared_ptr<Data::Blob> Data::Slot::Add(std::string name, const int type, Source& source, const int id)
 {
     Data::lowercase(name);
     auto blob = std::make_shared<Blob>(source, id);
     m_blobs.emplace(name, type, blob);
-    return *blob;
+    return blob;
 }
 
 void Data::AddBlobsFromSource(Slot& slot, Source& source, const int slotId)
@@ -86,9 +102,9 @@ void Data::AddBlobsFromSource(Slot& slot, Source& source, const int slotId)
         int id = q.GetIntField(0);
         int type = q.GetIntField(1);
         std::string name = q.GetStringField(2);
-        Blob& blob = slot.Add(name, type, source, id);
+        Data::lowercase(name);
+        m_blobs.emplace(name, type, slot.Add(name, type, source, id));
     }
-
 }
 
 void Data::AddDataPath(const boost::filesystem::path& datapath)
