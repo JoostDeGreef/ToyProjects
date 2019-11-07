@@ -15,7 +15,7 @@ ExternalProject_Add(png
 )
 
 #option(PNG_BUILD_ZLIB ON)
-#option(PNG_SHARED ON)
+#option(PNG_SHARED OFF)
 #option(PNG_STATIC ON)
 #option(PNG_TESTS  OFF)
 

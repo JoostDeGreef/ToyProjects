@@ -10,9 +10,9 @@ link_libraries(MathCore
                GLFW
                FREETYPE)
 
-add_library (${PROJECT_NAME} SHARED 
+add_library (${PROJECT_NAME} # SHARED 
              "src/OpenGL.cpp"
-			 "src/Font.cpp")
+             "src/Font.cpp")
 
 # directories where to search for header files
 target_include_directories(${PROJECT_NAME} PUBLIC include)

@@ -7,7 +7,7 @@ project(GoogleTest VERSION ${BUILD_NUMBER} DESCRIPTION "Google test framework")
 
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
-add_library (${PROJECT_NAME} SHARED
+add_library (${PROJECT_NAME} # SHARED
              "src/gtest/gtest-all.cc"
              "src-extra/ConsoleOutput.cpp"
              "src-extra/ConsoleOutput.h"

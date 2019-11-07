@@ -9,7 +9,7 @@ link_libraries(SQLiteDB
                boost
                Boost-FileSystem)
 
-add_library (${PROJECT_NAME} SHARED
+add_library (${PROJECT_NAME} # SHARED
              "src/Data.cpp")
 
 set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${PROJECT_VERSION})

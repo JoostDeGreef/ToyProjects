@@ -11,4 +11,6 @@ add_subdirectory ("Data")
 add_subdirectory ("DataTest")
 add_subdirectory ("Utils")
 add_subdirectory ("UtilsTest")
+add_subdirectory ("Logger")
+add_subdirectory ("LoggerTest")
 

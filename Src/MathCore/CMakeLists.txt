@@ -4,7 +4,6 @@ project(MathCore VERSION 1.0.0 DESCRIPTION "Core math functions")
 
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
-# not shared because of global variables, fix!
 add_library (${PROJECT_NAME}
              "src/MathCore.cpp")
 
