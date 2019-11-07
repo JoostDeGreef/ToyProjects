@@ -17,9 +17,9 @@ set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${PROJECT_VERSION})
 target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 
 add_custom_command(
-    TARGET ${PROJECT_NAME} POST_BUILD
+    TARGET ${PROJECT_NAME} PRE_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${CMAKE_SOURCE_DIR}/Data/processed/
-        $<TARGET_FILE_DIR:${PROJECT_NAME}>
+        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
     COMMENT "Copying data files...")
 
