@@ -8,5 +8,6 @@
 (cd freetype;./proper.sh)
 (cd PNG;./proper.sh)
 (cd ZLIB;./proper.sh)
+(cd spdlog;./proper.sh)
 
 

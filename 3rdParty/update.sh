@@ -24,3 +24,6 @@ echo PNG
 echo ZLIB
 (cd ZLIB;./update.sh) || exit 1
 
+echo spdlog
+(cd spdlog;./update.sh) || exit 1
+

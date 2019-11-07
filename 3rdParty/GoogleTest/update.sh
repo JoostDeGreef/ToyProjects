@@ -1,5 +1,6 @@
 #!/bin/bash
 
+PROJECT=GoogleTest
 REPO=https://github.com/google/googletest.git 
 SRC=googletest
 PYTHON=`which python`
