@@ -3,16 +3,17 @@
 #include <vector>
 #include <map>
 #include <set>
-#include <iostream>
+#include <string>
 #include <boost/filesystem.hpp>
 #include <boost/optional.hpp>
-#include <boost/dll.hpp>
 
 #include "SQLiteDB.h"
 #include "grid.h"
 
 class Data
 {
+protected:
+    static void lowercase(std::string& str);
 public:
     using Bytes = std::vector<unsigned char>;
 
@@ -26,16 +27,18 @@ public:
         SQLite::DB m_db;
     };
 
+    using Sources = std::map<boost::filesystem::path, Source>;
+
     class Blob
     {
     public:
-        Blob(const std::shared_ptr<Source>& source, int id)
+        Blob(Source& source, int id)
             : m_source(source)
             , m_id(id)
         {}
-        Bytes Get() const { return m_source->GetBlob(m_id); }
+        Bytes Get() const { return m_source.GetBlob(m_id); }
     private:
-        std::shared_ptr<Source> m_source;
+        Source& m_source;
         int m_id;
     };
 
@@ -46,44 +49,43 @@ public:
     public:
         using Slots = std::map<std::string, Slot>;
 
-        const Slot& operator[] (const std::string& key) const;
+        const Slot& operator[] (std::string key) const;
 
-        //iterator over files
+        // iterator over files
         auto begin() const { return m_blobs.begin(); }
         auto end() const { return m_blobs.end(); }
 
-        Slot& Add(const std::string& name);
-        Blob& Add(const std::string& name, const int type, const std::shared_ptr<Source>& source, const int id);
+        Bytes GetFont(std::string name) const;
+        std::pair<Bytes, Bytes> GetShader(std::string name) const;
+
+        Slot& Add(std::string name);
+        Blob& Add(std::string name, const int type, Source& source, const int id);
     private:
         Slots m_slots;
         Blobs m_blobs;
     };
 
-    template<typename ...Paths>
-    Data(Paths& ...datapaths)
+    Data(const std::initializer_list<boost::filesystem::path>& datapaths)
     {
-        std::vector<boost::filesystem::path> datapaths_vector{ datapaths... };
-        std::set<boost::filesystem::path> datapaths_set;
-        auto exe_path = boost::dll::program_location().parent_path();
-        for (const auto & path : datapaths_vector)
+        for (const auto& datapath : datapaths)
         {
-          const auto full_path = boost::filesystem::canonical(path.is_relative() ? exe_path / path : path);
-          datapaths_set.insert(full_path);
-        }
-        for (const auto& datapath : datapaths_set)
-        {
-          AddDataPath(datapath);
+            AddDataPath(datapath);
         }
     }
 
-    const Slot& operator[] (const std::string& key)
+    ~Data();
+
+    void AddDataPath(const boost::filesystem::path& datapath);
+
+    const Slot& operator[] (std::string key)
     {
+        Data::lowercase(key);
         return m_root[key];
     }
 private:
-    void AddDataPath(const boost::filesystem::path& datapath);
-    void AddBlobsFromSource(Slot & slot, std::shared_ptr<Source>& source, const int slotId = 0);
+    void AddBlobsFromSource(Slot& slot, Source& source, const int slotId = 0);
 
+    Sources m_sources;
     Slot m_root;
     Blobs m_blobs;
 };

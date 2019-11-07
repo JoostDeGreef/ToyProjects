@@ -12,7 +12,7 @@ namespace OpenGL
 
         const std::string& GetName() const { return m_fontName; }
 
-        void Draw(const double x,const double y, const std::string& text);
+        void Draw(const double x, const double y, const std::string& text);
         Size GetSize(const std::string& text);
 
     private:

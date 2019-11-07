@@ -6,11 +6,11 @@
 #if defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__)
 #include "VisualStudioOutput.h"
 
-GTEST_API_ int main(int argc, char **argv) 
+GTEST_API_ int main(int argc, char** argv)
 {
     VisualStudioOutput::Start();
 #else
-GTEST_API_ int main(int argc, char **argv) 
+GTEST_API_ int main(int argc, char** argv)
 {
 #endif
     ConsoleOutput::Start();

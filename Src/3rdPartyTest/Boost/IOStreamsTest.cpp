@@ -11,16 +11,16 @@ class IOStreamsTest : public Test
 {
 protected:
 
-  virtual void SetUp()
-  {
-  }
+    virtual void SetUp()
+    {
+    }
 
-  virtual void TearDown()
-  {
-  }	
+    virtual void TearDown()
+    {
+    }
 };
 
-std::string string_compress(const std::string &data)
+std::string string_compress(const std::string& data)
 {
     std::stringstream compressed;
     std::stringstream original;
@@ -32,7 +32,7 @@ std::string string_compress(const std::string &data)
     return compressed.str();
 }
 
-std::string string_decompress(const std::string &data)
+std::string string_decompress(const std::string& data)
 {
     std::stringstream compressed;
     std::stringstream decompressed;
@@ -46,10 +46,10 @@ std::string string_decompress(const std::string &data)
 
 TEST_F(IOStreamsTest, BasicTest)
 {
-  std::string input = "This is a small test string. This is a small test string. This is a small test string.";
-  std::string compressed = string_compress(input);
-  std::string output = string_decompress(compressed);
-  EXPECT_EQ(input,output);
-  EXPECT_LE(compressed.size(),input.size());
+    std::string input = "This is a small test string. This is a small test string. This is a small test string.";
+    std::string compressed = string_compress(input);
+    std::string output = string_decompress(compressed);
+    EXPECT_EQ(input, output);
+    EXPECT_LE(compressed.size(), input.size());
 }
 
