@@ -269,7 +269,7 @@ public:
         auto iters = find_all<I0>(key0);
         auto iter = std::find_if(std::get<0>(iters), std::get<1>(iters), [&key1](const grid_element<I0> & element)
             {
-                return key1 == element.get<I1>();
+                return key1 == std::get<I1>(*element.row());
             });
         return iter == std::get<1>(iters) ? end<I0>() : iter;
     }

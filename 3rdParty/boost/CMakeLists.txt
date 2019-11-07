@@ -3,6 +3,7 @@ include(Common)
 project(boost VERSION 1.0.0 DESCRIPTION "boost framework")
 
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+SET(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
