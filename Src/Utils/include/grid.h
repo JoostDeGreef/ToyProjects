@@ -154,7 +154,7 @@ public:
 
     static auto insert(data_type& data, row_type* row)
     {
-        grid_type::insert(data, row);
+        return grid_type::insert(data, row);
     }
 
     static void erase(data_type& data, row_type const* const row)
@@ -243,10 +243,10 @@ public:
         applicator::clear(m_data);
     }
 
-    void emplace(TYPE t0, TYPES ... ts)
+    auto emplace(TYPE t0, TYPES ... ts)
     {
         auto p = new row_type(t0, ts...);
-        applicator::insert(m_data, p);
+        return applicator::insert(m_data, p);
     }
 
     // get the value for a column by searching on another column

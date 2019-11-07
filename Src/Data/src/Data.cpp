@@ -45,6 +45,20 @@ std::string Data::Source::GetName(const int id)
     }
 }
 
+int Data::Source::GetType(const int id)
+{
+    auto q = m_db.ExecQuery("SELECT Type FROM Data WHERE Id = '%1%' LIMIT 1", id);
+    if (!q.IsEOF())
+    {
+        return q.GetIntField(0);
+    }
+    else
+    {
+        // todo: throw error?
+        return -1;
+    }
+}
+
 Data::Bytes Data::Slot::GetFont(std::string name) const
 {
     Data::lowercase(name);
@@ -77,13 +91,11 @@ Data::Slot& Data::Slot::Add(std::string name)
     return m_slots[name];
 }
 
-// todo make this a reference after grid.emplace returns the inserted item
-std::shared_ptr<Data::Blob> Data::Slot::Add(std::string name, const int type, Source& source, const int id)
+const std::shared_ptr<Data::Blob>& Data::Slot::Add(std::string name, const int type, Source& source, const int id)
 {
     Data::lowercase(name);
     auto blob = std::make_shared<Blob>(source, id);
-    m_blobs.emplace(name, type, blob);
-    return blob;
+    return std::get<2>(*m_blobs.emplace(name, type, blob)->row());
 }
 
 void Data::AddBlobsFromSource(Slot& slot, Source& source, const int slotId)
