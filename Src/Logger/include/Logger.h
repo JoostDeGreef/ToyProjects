@@ -2,9 +2,8 @@
 
 #include <vector>
 #include <memory>
-#include <boost/filesystem.hpp>
 
-//#define FMT_STRING_ALIAS 1
+#define FMT_STRING_ALIAS 1
 #include <fmt/format.h>
 
 namespace Logger
@@ -22,30 +21,17 @@ namespace Logger
     class ISink
     {
     public:
-        virtual void Log(const char* msg) = 0;
+        virtual void Log(const Level level, const uint64_t ticks, const char* msg) = 0;
     };
 
-namespace LoggerSinks
-{
-    class Console final : public ISink
-    {
-    public:
-        void Log(const char* msg) override;
-    };
+  class Logger
+  {
+  public:
 
-    class File final : public ISink
-    {
-    public:
-        void Log(const char* msg) override;
-    };
-}
+    static const std::shared_ptr<Logger> & Instance(const char* name = "");
 
-class Logger
-{
-public:
-
-    static std::shared_ptr<Logger> Instance();
-
+    template<typename Sink,typename... Args>
+    void AddSink(Args&& ... args);
     void AddSink(std::shared_ptr<ISink> sink);
     void SetLevel(const Level level) { m_level = level; }
 
@@ -58,7 +44,7 @@ public:
 
 private:
     template<typename... Args> void Log(const Level level,const char* fmt, Args&& ... args) const;
-    void Log(const char * msg) const;
+    void LogToSinks(const Level level,const std::string &msg) const;
 
     Level m_level;
     std::vector<std::shared_ptr<ISink>> m_sinks;
@@ -93,7 +79,14 @@ template<typename... Args> void Logger::Log(const Level level, const char* f, Ar
 {
     if (level >= m_level)
     {
-        Log(fmt::format(f, args...).c_str());
+        LogToSinks(level, std::move(fmt::format(f, args...)));
     }
 }
+
+template<typename Sink,typename... Args> void Logger::AddSink(Args&& ...args)
+{
+  auto sink = std::make_shared<Sink>(std::forward<Args>(args)...);
+  AddSink(sink);
+}
+
 }; // namespace

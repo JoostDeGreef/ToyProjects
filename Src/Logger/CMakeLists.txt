@@ -9,7 +9,9 @@ link_libraries(Format
                Boost-FileSystem)
 
 add_library (${PROJECT_NAME} # SHARED
-             "src/Logger.cpp")
+             "src/Logger.cpp"
+             "src/Sinks/Console.cpp"
+             "src/Sinks/File.cpp")
 
 set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${PROJECT_VERSION})
 

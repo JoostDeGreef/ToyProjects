@@ -5,43 +5,38 @@
 #include <vector>
 #include <map>
 #include <set>
+#include <chrono>
 using namespace std;
-
-#include <boost/dll.hpp>
 
 #include "Logger.h"
 
 namespace Logger
 {
-namespace LoggerSinks
-{
-    void Console::Log(const char* msg)
+  const std::shared_ptr<Logger> & Logger::Instance(const char* name)
+  {
+    static std::map<std::string,std::shared_ptr<Logger>> loggers;
+    if(!loggers[name])
     {
-        cout << msg << endl;
+      auto logger = std::make_shared<Logger>();
+      logger->SetLevel(Level::Info);
+      loggers[name] = logger;
     }
+    return loggers[name];
+  }
 
-    void File::Log(const char* msg)
-    {
-
-    }
-}
-
-std::shared_ptr<Logger> Logger::Instance()
-{
-    static auto logger = make_shared<Logger>();
-    return logger;
-}
-
-void Logger::AddSink(std::shared_ptr<ISink> sink)
-{
+  void Logger::AddSink(std::shared_ptr<ISink> sink)
+  {
     m_sinks.emplace_back(sink);
-}
+  }
 
-void Logger::Log(const char* msg) const
-{
+  void Logger::LogToSinks(const Level level, const std::string & msg) const
+  {
+    uint64_t ticks = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
     for (const auto& sink : m_sinks)
     {
-        sink->Log(msg);
+        sink->Log(level,ticks,msg.c_str());
     }
+  }
 }
-}
+
+
