@@ -1,6 +1,6 @@
 #!/bin/bash
 
-rm -rf spdlog
+rm -rf fmt
 
 find . -name "*~" -exec rm -f "{}" \;
 

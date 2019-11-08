@@ -1,10 +1,10 @@
 include(Common)
 
-project(Logger VERSION 1.0.0 DESCRIPTION "SPDLog wrapper library")
+project(Logger VERSION 1.0.0 DESCRIPTION "Logging library")
 
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
-link_libraries(SPDLog
+link_libraries(Format
                boost
                Boost-FileSystem)
 

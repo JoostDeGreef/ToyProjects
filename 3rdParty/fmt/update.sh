@@ -1,8 +1,8 @@
 #!/bin/bash
 
-PROJECT=SPDLog
-REPO=https://github.com/gabime/spdlog.git
-SRC=spdlog
+PROJECT=FMT
+REPO=https://github.com/fmtlib/fmt.git
+SRC=fmt
 
 if [ ! -d ${SRC} ];
 then

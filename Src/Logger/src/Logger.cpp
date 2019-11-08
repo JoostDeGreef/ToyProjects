@@ -8,20 +8,19 @@
 using namespace std;
 
 #include <boost/dll.hpp>
-#include <boost/optional.hpp>
-
-#include <spdlog/spdlog.h>
 
 #include "Logger.h"
 
+namespace Logger
+{
 namespace LoggerSinks
 {
-    void Console::Log(const char* msg) const
+    void Console::Log(const char* msg)
     {
         cout << msg << endl;
     }
 
-    void File::Log(const char* msg) const
+    void File::Log(const char* msg)
     {
 
     }
@@ -33,7 +32,7 @@ std::shared_ptr<Logger> Logger::Instance()
     return logger;
 }
 
-void Logger::AddSink(std::shared_ptr<ILoggerSink> sink)
+void Logger::AddSink(std::shared_ptr<ISink> sink)
 {
     m_sinks.emplace_back(sink);
 }
@@ -44,4 +43,5 @@ void Logger::Log(const char* msg) const
     {
         sink->Log(msg);
     }
+}
 }
