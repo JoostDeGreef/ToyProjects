@@ -5,7 +5,7 @@ namespace OpenGL
     class Font
     {
     public:
-        Font(std::string&& fontName, const int size = 12);
+        Font(std::shared_ptr<Data>& data,std::string&& fontName, const int size = 12);
 
         Font& PixelSize(const double pixelSize);
         Font& Color(const Color& color);
@@ -16,6 +16,7 @@ namespace OpenGL
         Size GetSize(const std::string& text);
 
     private:
+        std::shared_ptr<Data> m_data;
         std::string m_fontName;
         int m_size;
         double m_pixelSize;

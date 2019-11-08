@@ -6,14 +6,19 @@ set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
 link_libraries(MathCore
                boost
+			   Data
                GLAD
                GLFW
                FREETYPE)
 
 add_library (${PROJECT_NAME} # SHARED 
              "src/OpenGL.cpp"
-             "src/Font.cpp")
+             "src/Font.cpp"
+			 "src/Freetype.cpp"
+			 "src/CharacterMap.cpp")
 
 # directories where to search for header files
-target_include_directories(${PROJECT_NAME} PUBLIC include)
+target_include_directories(${PROJECT_NAME}
+    PUBLIC include
+	PRIVATE include/internal)
 
