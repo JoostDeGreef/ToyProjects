@@ -13,9 +13,9 @@ namespace Logger
 {
     namespace Sink
     {
-        void File::Log(const Level level, const uint64_t ticks, const char* msg)
+        void AsyncQueue::Log(const Level level, const uint64_t ticks, const char* msg)
         {
-
+            m_sink->Log(level, ticks, msg);
         }
     }
 }
