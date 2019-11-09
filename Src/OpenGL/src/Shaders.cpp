@@ -1,42 +1,18 @@
 #include <string>
 #include <unordered_map>
 #include <algorithm>
-using namespace std;
 
-#include "Geometry.h"
-#include "GLWrappers.h"
-#include "Shaders.h"
-using namespace Viewer;
+#include "Logger.h"
+#include "Data.h"
+#include "OpenGL.h"
+
+using namespace std;
+using namespace OpenGL;
 
 namespace
 {
-    static const char* const textVertexShader = R"VertexShader(
-#version 440
-
-void main()
-{
-    gl_Position = ftransform();
-    gl_TexCoord[0] = gl_MultiTexCoord0;
-}
-)VertexShader";
-
-    static const char* const textFragmentShader = R"FragmentShader(
-#version 440
-
-uniform sampler2D texture;
-uniform vec4 inputColor;
-
-void main()
-{
-    gl_FragColor = vec4(inputColor.rgb, texture2D(texture, gl_TexCoord[0].st).r); 
-}
-)FragmentShader";
-
-
-
-
-    GLuint LoadShaders(const char* const vertex, const char* const fragment) {
-
+    GLuint LoadShaders(const char* const vertex, const char* const fragment)
+    {
         // Create the shaders
         GLuint vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
         GLuint fragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
@@ -47,7 +23,8 @@ void main()
             int infoLogLength;
             glGetShaderiv(shaderID, GL_COMPILE_STATUS, &result);
             glGetShaderiv(shaderID, GL_INFO_LOG_LENGTH, &infoLogLength);
-            if (infoLogLength > 0) {
+            if (infoLogLength > 0) 
+            {
                 std::vector<char> errorMessage(infoLogLength + 1);
                 glGetShaderInfoLog(shaderID, infoLogLength, NULL, &errorMessage[0]);
                 return std::string(errorMessage.begin(), errorMessage.end());
@@ -123,8 +100,10 @@ Shaders::Type Shaders::Select(Type shader)
 
     if (shaders.m_selected != shader)
     {
-        auto AddAndSelectShader = [&](Type shader, const char* const vertex, const char* const fragment)
+        auto AddAndSelectShader = [&](Type shader)
         {
+            const char* const vertex = reinterpret_cast<char*>(shaders.m_shaderSources[Type::Text].first.data());
+            const char* const fragment = reinterpret_cast<char*>(shaders.m_shaderSources[Type::Text].second.data());
             GLuint programId = LoadShaders(vertex, fragment);
             if (programId == 0)
             {
@@ -146,7 +125,7 @@ Shaders::Type Shaders::Select(Type shader)
                 shaders.m_selected = Type::None;
                 break;
             case Type::Text:
-                AddAndSelectShader(Type::Text, textVertexShader, textFragmentShader);
+                AddAndSelectShader(Type::Text);
                 break;
             }
             iter = shaders.m_shaders.find(shaders.m_selected);
@@ -169,3 +148,7 @@ int Shaders::GetUniformLocation(const char* const name)
     return glGetUniformLocation(iter->second, name);
 }
 
+void Shaders::LoadShaderSources(Data& data)
+{
+    shaders.m_shaderSources[Type::Text] = data[std::string("shaders")].GetShader("text");
+}

@@ -1,9 +1,10 @@
+#pragma once
 
 class UserInterfaceImp;
 class UserInterface
 {
 public:
-    UserInterface();
+    UserInterface(Data && data);
     ~UserInterface();
 
     bool Init();

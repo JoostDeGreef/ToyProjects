@@ -69,6 +69,8 @@ public:
         Blobs m_blobs;
     };
 
+    Data()
+    {}
     Data(const std::initializer_list<boost::filesystem::path>& datapaths)
     {
         for (const auto& datapath : datapaths)

@@ -10,29 +10,23 @@ using namespace std;
 
 #include "Data.h"
 #include "OpenGL.h"
-#include "Freetype.h"
-#include "CharacterMap.h"
 using namespace OpenGL;
 
-CharacterMap& GetCharacterMap(const std::string& fontName, const unsigned int size)
+CharacterMap& Font::GetCharacterMap(const unsigned int size)
 {
-    static std::unordered_map<std::string, CharacterMap> characterMaps;
-    std::string id = std::to_string(size) + ";" + fontName;
-    auto iter = characterMaps.find(id);
-    if (iter == characterMaps.end())
+    auto iter = m_characterMaps.find(size);
+    if (iter == m_characterMaps.end())
     {
-        iter = characterMaps.emplace(id, CharacterMap(fontName, size)).first;
+        iter = m_characterMaps.emplace(size, CharacterMap(m_bytes, size)).first;
     }
     return iter->second;
 }
 
-
-Font::Font(std::shared_ptr<Data> & data,std::string&& fontName, const int size)
-    : m_fontName(std::move(fontName))
-    , m_size(size)
+Font::Font(Data::Bytes&& bytes, const int size)
+    : m_size(size)
     , m_pixelSize(1 / 800)
     , m_color(1, 1, 1, 1)
-    , m_data(std::move(data))
+    , m_bytes(std::move(bytes))
 {}
 
 Font& Font::PixelSize(const double pixelSize)
@@ -49,12 +43,12 @@ Font& Font::Color(const OpenGL::Color& color)
 
 void Font::Draw(const double x, const double y, const std::string& text)
 {
-    CharacterMap& characterMap = GetCharacterMap(m_fontName, m_size);
-    characterMap.RenderText(std::move(text), x, y, m_pixelSize, m_pixelSize, m_color);
+    CharacterMap& characterMap = GetCharacterMap(m_size);
+    characterMap.RenderText(text, x, y, m_pixelSize, m_pixelSize, m_color);
 }
 
 Size Font::GetSize(const std::string& text)
 {
-    CharacterMap& characterMap = GetCharacterMap(m_fontName, m_size);
-    return characterMap.MeasureText(std::move(text), m_pixelSize, m_pixelSize);
+    CharacterMap& characterMap = GetCharacterMap(m_size);
+    return characterMap.MeasureText(text, m_pixelSize, m_pixelSize);
 }

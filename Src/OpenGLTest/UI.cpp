@@ -14,14 +14,13 @@
 using namespace std;
 using namespace std::chrono_literals;
 
-#include "boost/format.hpp"
 #include "OpenGL.h"
 #include "UI.h"
 
 class UserInterfaceImp
 {
 public:
-    UserInterfaceImp();
+    UserInterfaceImp(Data&& data);
 
     bool Init();
     void Run();
@@ -50,6 +49,9 @@ private:
     GLFWwindow* m_window;
     int m_width;
     int m_height;
+    std::unique_ptr<OpenGL::Font> m_font;
+
+    Data m_data;
 };
 
 //
@@ -65,9 +67,9 @@ static void error_callback(int error, const char* description)
 // UserInterface
 //
 
-UserInterface::UserInterface()
+UserInterface::UserInterface(Data && data)
 {
-    m_imp = new UserInterfaceImp();
+    m_imp = new UserInterfaceImp(std::move(data));
 }
 
 UserInterface::~UserInterface()
@@ -94,14 +96,19 @@ void UserInterface::Cleanup()
 // UserInterfaceImp
 //
 
-UserInterfaceImp::UserInterfaceImp()
+UserInterfaceImp::UserInterfaceImp(Data&& data)
     : m_window(nullptr)
     , m_width(800)
     , m_height(600)
+    , m_data(std::move(data))
 {}
 
 bool UserInterfaceImp::Init()
 {
+    // load data
+    OpenGL::Shaders::LoadShaderSources(m_data);
+    m_font = std::make_unique<OpenGL::Font>(m_data["fonts"].GetFont("Prida"));
+    // setup glfw
     glfwSetErrorCallback(error_callback);
     return glfwInit();
 }
@@ -230,8 +237,8 @@ void UserInterfaceImp::DrawFPS()
         double f = (times.size() - 1) / (times.back() - times.front());
         std::string fps = (boost::format("FPS %1$.0f") % f).str();
         cout << fps << endl;
- //       auto size = m_font->GetSize(fps);
- //       m_font->Color(Geometry::Color::Red()).Draw(m_x - size[0] - 2 * m_pixelSize, 2 * m_pixelSize - m_y, fps);
+        auto size = m_font->GetSize(fps);
+        m_font->Color(OpenGL::Color::Red()).Draw(m_width - size[0], 0, fps);
     }
 }
 
