@@ -39,19 +39,22 @@ namespace Logger
         };
 
 
-        // Process the messages asynchronous    
+        // Process the messages asynchronous
         // When the worker sink can not keep up, dispose of messages
         class AsyncQueue final : public ISink
         {
         public:
-            AsyncQueue(std::shared_ptr<ISink>&& sink)
+            AsyncQueue(std::shared_ptr<ISink>&& sink, uint64_t highwaterMark = 256)
                 : m_sink(std::move(sink))
+                , m_highwaterMark(highwaterMark)
             {}
 
             void Log(const Level level, const uint64_t ticks, const char* msg) override;
         private:
             std::shared_ptr<ISink> m_sink;
+            uint64_t m_highwaterMark;
         };
+                
     } // namespace
 } // namespace
 

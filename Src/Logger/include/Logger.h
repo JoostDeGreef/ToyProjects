@@ -21,7 +21,7 @@ namespace Logger
     class ISink
     {
     public:
-        virtual void Log(const Level level, const uint64_t ticks, const char* msg) = 0;
+        virtual void Log(const Level level, const uint64_t ticks, const char * msg) = 0;
     };
 
     class Logger
@@ -44,7 +44,7 @@ namespace Logger
 
     private:
         template<typename... Args> void Log(const Level level, const char* fmt, Args&& ... args) const;
-        void LogToSinks(const Level level, const std::string& msg) const;
+        void LogToSinks(const Level level, const std::string & msg) const;
 
         Level m_level;
         std::vector<std::shared_ptr<ISink>> m_sinks;
