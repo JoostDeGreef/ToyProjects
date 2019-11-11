@@ -33,5 +33,5 @@ add_custom_target(freetype_target DEPENDS ${FREETYPE_FILE})
 add_library(FREETYPE INTERFACE)
 add_dependencies(FREETYPE freetype_target)
 target_include_directories(FREETYPE INTERFACE ${FREETYPE_HEADER_FOLDER})
-target_link_libraries(FREETYPE INTERFACE ${FREETYPE_FILE})
+target_link_libraries(FREETYPE INTERFACE ${FREETYPE_FILE} PNG ZLIB)
 
