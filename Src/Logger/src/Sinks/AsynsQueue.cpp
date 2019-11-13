@@ -17,6 +17,10 @@ namespace Logger
         {
             m_sink->Log(level, ticks, msg);
         }
+        void AsyncQueue::Flush()
+        {
+            m_sink->FLush();
+        }
     }
 }
 

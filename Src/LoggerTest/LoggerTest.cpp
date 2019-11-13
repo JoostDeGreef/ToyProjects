@@ -25,6 +25,8 @@ public:
     {
       m_messages.emplace_back(msg);
     }
+    void Flush() override
+    {}
     
     std::vector<std::string> m_messages;
 };
@@ -37,6 +39,8 @@ TEST_F(LoggerTest, Console)
     
     logger->Debug("Is this {}?","visible");
     logger->Info("The magic number is {}",42);
+    
+    logger.reset();
 }
 
 TEST_F(LoggerTest, Format)
@@ -48,6 +52,8 @@ TEST_F(LoggerTest, Format)
     
     logger->Debug("Should not be {}","visible");
     logger->Info("The magic number is {}",42);
+    
+    logger.reset();
     
     EXPECT_EQ("The magic number is 42",sink->m_messages.front());
 }
@@ -65,8 +71,12 @@ TEST_F(LoggerTest, Levels)
     logger->Warning("Warning");
     logger->Error("Error");
     logger->Fatal("Fatal");
+   
+    logger->Flush();
     
     EXPECT_EQ(4,sink->m_messages.size());
+   
+    logger.reset();
 }
 
 

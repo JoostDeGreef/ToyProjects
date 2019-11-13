@@ -22,18 +22,22 @@ namespace Logger
     {
     public:
         virtual void Log(const Level level, const uint64_t ticks, const char * msg) = 0;
+        virtual void Flush() = 0;
     };
 
     class Logger
     {
     public:
+        Logger(const Level level);
+        ~Logger();
 
-        static const std::shared_ptr<Logger>& Instance(const char* name = "");
+        static std::shared_ptr<Logger> Instance(const char* name = "", const Level level = Level::Info);
 
         template<typename Sink, typename... Args>
         void AddSink(Args&& ... args);
         void AddSink(std::shared_ptr<ISink> sink);
         void SetLevel(const Level level) { m_level = level; }
+        void Flush();
 
         template<typename... Args> void Trace(const char* fmt, Args&& ... args) const;
         template<typename... Args> void Debug(const char* fmt, Args&& ... args) const;
@@ -47,7 +51,8 @@ namespace Logger
         void LogToSinks(const Level level, const std::string & msg) const;
 
         Level m_level;
-        std::vector<std::shared_ptr<ISink>> m_sinks;
+        
+        class LoggerCore * m_core;
     };
 
     template<typename... Args> void Logger::Trace(const char* fmt, Args&& ... args) const

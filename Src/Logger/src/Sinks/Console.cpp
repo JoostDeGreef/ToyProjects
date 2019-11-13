@@ -17,7 +17,11 @@ namespace Logger
             case Level::Error:   m_stream << "[ Error    ] "; break;
             case Level::Fatal:   m_stream << "[ Fatal    ] "; break;
             }
-            m_stream << msg << std::endl;
+            m_stream << msg << "\n";
+        }
+        void Console::Flush()
+        {
+           m_stream.flush();
         }
     }
 }

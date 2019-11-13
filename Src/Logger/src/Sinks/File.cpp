@@ -17,6 +17,10 @@ namespace Logger
         {
 
         }
+        void File::Flush()
+        {
+        
+        }
     }
 }
 

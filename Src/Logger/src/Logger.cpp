@@ -8,117 +8,178 @@
 #include <chrono>
 #include <thread>
 #include <mutex>
-
-#include <boost/lockfree/queue.hpp>
+#include <condition_variable>
+#include <atomic>
 
 #include "Logger.h"
 
 namespace Logger
 {
-  const std::shared_ptr<Logger> & Logger::Instance(const char* name)
-  {
-    static std::map<std::string,std::shared_ptr<Logger>> loggers;
-    if(!loggers[name])
-    {
-      auto logger = std::make_shared<Logger>();
-      logger->SetLevel(Level::Info);
-      loggers[name] = logger;
-    }
-    return loggers[name];
-  }
 
-  void Logger::AddSink(std::shared_ptr<ISink> sink)
+  namespace 
   {
-    m_sinks.emplace_back(sink);
-  }
-
-  void Logger::LogToSinks(const Level level, const std::string & msg) const
-  {
-    const int bufferSize = 1024;
     struct Message
     {
-        Message()
+        void Set(const uint64_t ticks, const Level level, const std::string & msg)
         {
-           m_size = 128;
-           m_msg = new char[m_size];
-        }
-        ~Message()
-        {
-          delete [] m_msg;
-        }
-        void Resize(const size_t s)
-        {
-          delete m_msg;
-          m_size = s;
-          m_msg = new char[m_size];
+          m_ticks = ticks;
+          m_level = level;
+          m_msg = msg;
         }
     
         uint64_t m_ticks;
         Level m_level;
-        int m_size;
-        char * m_msg;
+        std::string m_msg;
     };
-    class MessageStore
+  }
+  
+  class LoggerCore
+  {
+    static const unsigned int buckets = 8;
+  public:
+    LoggerCore()
+      : m_count(0)
+      , m_writer_index(0)
+      , m_quit(false)
+      , m_thread()
     {
-    public:
-      MessageStore()
+      for(int i=0;i<buckets;++i)
       {
-        AddBlock();
+        m_writing_started[i].clear();
+        m_writing_done[i].store(false);
       }
-      ~MessageStore()
-      {}
-      Message* AllocMessage(const Level level, const std::string & msg)
-      {
-        uint64_t ticks = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-        Message* message;
-        while(!m_messagePtrStore.pop(message))
-        {
-          AddBlock();
-        }
-        message->m_ticks = ticks;
-        message->m_level = level;
-        if(message->m_size < msg.size()+1)
-        {
-          message->resize(msg.size()+1);
-        }
-        memcpy(message.m_msg,msg.c_str(),msg.size()+1);
-        return message;
-      }
-      void FreeMessage(Message* msg)
-      {
-        messagePtrStore.push(msg);
-      }
-    private:
-      std::list<std::vector<Message>> m_messageStore;
-      boost::lockfree::queue<Message*> m_messagePtrStore;
-      std::mutex m_mutex;
-      
-      void AddBlock()
-      {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        std::vector<Message> block;
-        block.resize(128);
-        for(auto & message: block)
-        {
-           messagePtrStore.push(&message);
-        }
-        m_messageStore.push_back(std::move(block));
-      }
-    };
-    static MessageStore messageStore;
-    static boost::lockfree::queue<Message*> messages(bufferSize);
-    messages.push(Message{ticks,level,AllocString(msg)});
+      StartThread();
+    }
+    ~LoggerCore()
+    {
+      StopThread();
+    }
+    
+    void StartThread()
+    {
+      m_thread = std::thread(LoggerThread,this);
+    }
 
-    // todo: add worker thread around this
-
-    messages.consume_all([&](Message* message)
+    void StopThread()
+    {    
+      {
+        std::unique_lock<std::mutex> lock(m_state_mutex);
+        m_quit.store(true);
+      }
+      m_state_cv.notify_one();
+      m_thread.join();
+    }
+    
+    void Flush()
+    {
+      StopThread();
+      for (const auto& sink : m_sinks)
+      {
+        sink->Flush();
+      }    
+      StartThread();
+    }
+    
+    void LogToSinks(const uint64_t ticks, const Level level, const std::string & msg)
+    {
+      for(;;)
+      {
+        int index = (m_writer_index++) % buckets;
+        if(!m_writing_started[index].test_and_set())
         {
+          m_messages[index].Set(ticks,level,msg);
+          m_count++;
+          m_writing_done[index].store(true);
+          m_state_cv.notify_one();
+          return;
+        }
+      }    
+    }
+
+    void LoggerThreadRunner()
+    {
+      std::unique_lock<std::mutex> lock(m_state_mutex);
+      int index = 0;
+      while(!m_quit.load() || m_count.load()>0)
+      {
+        if(m_count.load()<=0 && !m_quit.load())
+        {
+          m_state_cv.wait(lock,[&](){ return m_count.load()>0 || m_quit.load();});
+        }
+        while(m_count.load() > 0)
+        {
+          index = (index+1) % buckets;
+          if(m_writing_started[index].test_and_set())
+          {
+            while(!m_writing_done[index].load())
+            {
+              std::this_thread::yield();
+            }
+            auto & message = m_messages[index];
             for (const auto& sink : m_sinks)
             {
-                sink->Log(message->m_level,message->m_ticks,message->m_msg);
+              sink->Log(message.m_level,message.m_ticks,message.m_msg.c_str());
             }
-            messageStore.FreeMessage(message);
-        });
+            --m_count;
+            m_writing_done[index].store(false);
+          }
+          m_writing_started[index].clear();
+        }
+      }
+    }    
+    static void LoggerThread(LoggerCore *This)
+    {
+      This->LoggerThreadRunner();
+    }
+    
+    std::atomic<int> m_count;
+    std::atomic<unsigned int> m_writer_index;
+    std::atomic<bool> m_quit;
+    std::atomic_flag m_writing_started[buckets];
+    std::atomic<bool> m_writing_done[buckets];
+    std::array<Message,buckets> m_messages;
+    std::vector<std::shared_ptr<ISink>> m_sinks;
+    std::mutex m_state_mutex;
+    std::condition_variable m_state_cv;
+    std::thread m_thread;
+  };
+
+  Logger::Logger(const Level level)
+  {
+    m_core = new LoggerCore;
+  }
+
+  Logger::~Logger()
+  {
+    delete m_core;
+  }
+
+  std::shared_ptr<Logger> Logger::Instance(const char* name,const Level level)
+  {
+    static std::map<std::string,std::weak_ptr<Logger>> loggers;    
+    auto ptr = loggers[name].lock();
+    if(!ptr)
+    {
+      ptr = std::make_shared<Logger>(level);
+      loggers[name] = ptr;
+    }
+    return ptr;
+  }
+
+  void Logger::AddSink(std::shared_ptr<ISink> sink)
+  {
+    m_core->m_sinks.emplace_back(sink);
+  }
+
+  void Logger::LogToSinks(const Level level, const std::string & msg) const
+  {
+    uint64_t ticks = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+    m_core->LogToSinks(ticks, level, msg);
+  }
+  
+  void Logger::Flush()
+  {
+    m_core->Flush();
   }
 }
 
