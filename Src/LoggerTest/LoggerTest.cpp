@@ -43,6 +43,26 @@ TEST_F(LoggerTest, Console)
     logger.reset();
 }
 
+TEST_F(LoggerTest, File)
+{
+    auto file = boost::filesystem::unique_path();
+    auto logger = Logger::Logger::Instance("File");
+    logger->SetLevel(Logger::Level::Info);
+    logger->AddSink<Logger::Sink::File>(file);
+
+    logger->Debug("Is this {}?", "visible");
+    logger->Info("The magic number is {}", 42);
+
+    logger.reset();
+
+    std::ifstream f(file.c_str());
+    int n = std::count(std::istreambuf_iterator<char>(f), std::istreambuf_iterator<char>(), '\n');
+
+    boost::filesystem::remove(file);
+
+    EXPECT_EQ(1, n);
+}
+
 TEST_F(LoggerTest, Format)
 {
     auto sink = std::make_shared<StoreSink>();
@@ -90,7 +110,7 @@ TEST_F(LoggerTest, StressTest)
         for (int i = 0; i < 1000; ++i)
         {
             logger->Warning("test {}",i);
-            std::this_thread::yield();
+//            std::this_thread::yield();
         }
     };
 

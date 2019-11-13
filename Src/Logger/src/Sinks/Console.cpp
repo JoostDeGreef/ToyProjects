@@ -6,18 +6,19 @@ namespace Logger
 {
     namespace Sink
     {
+        Console::Console(std::ostream& stream, std::shared_ptr<IFormatter> formatter)
+            : m_formatter(formatter)
+            , m_stream(stream)
+        {
+            m_stream << m_formatter->Header();
+        }
+        Console::~Console()
+        {
+            m_stream << m_formatter->Footer();
+        }
         void Console::Log(const Level level, const uint64_t ticks, const std::string & msg)
         {
-            switch (level)
-            {
-            case Level::Trace:   m_stream << "[ Trace    ] "; break;
-            case Level::Debug:   m_stream << "[ Debug    ] "; break;
-            case Level::Info:    m_stream << "[ Info     ] "; break;
-            case Level::Warning: m_stream << "[ Warning  ] "; break;
-            case Level::Error:   m_stream << "[ Error    ] "; break;
-            case Level::Fatal:   m_stream << "[ Fatal    ] "; break;
-            }
-            m_stream << msg << "\n";
+            m_stream << m_formatter->Format(level, ticks, msg);
         }
         void Console::Flush()
         {
