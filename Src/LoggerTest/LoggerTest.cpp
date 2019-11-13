@@ -21,7 +21,7 @@ protected:
 class StoreSink final : public Logger::ISink
 {
 public:
-    void Log(const Logger::Level level,const uint64_t ticks,const char* msg) override
+    void Log(const Logger::Level level,const uint64_t ticks,const std::string & msg) override
     {
       m_messages.emplace_back(msg);
     }

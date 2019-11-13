@@ -15,16 +15,15 @@
 
 namespace Logger
 {
-
   namespace 
   {
     struct Message
     {
-        void Set(const uint64_t ticks, const Level level, const std::string & msg)
+        void Set(const uint64_t ticks, const Level level, std::string && msg)
         {
           m_ticks = ticks;
           m_level = level;
-          m_msg = msg;
+          m_msg = std::move(msg);
         }
     
         uint64_t m_ticks;
@@ -45,8 +44,7 @@ namespace Logger
     {
       for(int i=0;i<buckets;++i)
       {
-        m_writing_started[i].clear();
-        m_writing_done[i].store(false);
+        m_state[i].store(0);
       }
       StartThread();
     }
@@ -80,19 +78,24 @@ namespace Logger
       StartThread();
     }
     
-    void LogToSinks(const uint64_t ticks, const Level level, const std::string & msg)
+    void LogToSinks(const uint64_t ticks, const Level level, std::string && msg)
     {
       for(;;)
       {
         int index = (m_writer_index++) % buckets;
-        if(!m_writing_started[index].test_and_set())
+        int state = m_state[index]++;
+        if(state == 0)
         {
-          m_messages[index].Set(ticks,level,msg);
+          m_messages[index].Set(ticks,level,std::move(msg));
           m_count++;
-          m_writing_done[index].store(true);
+          m_state[index].store(10000);
           m_state_cv.notify_one();
           return;
         }
+        else
+        {
+          --m_state[index];
+        }        
       }    
     }
 
@@ -109,21 +112,16 @@ namespace Logger
         while(m_count.load() > 0)
         {
           index = (index+1) % buckets;
-          if(m_writing_started[index].test_and_set())
+          if(m_state[index].load() >= 10000)
           {
-            while(!m_writing_done[index].load())
-            {
-              std::this_thread::yield();
-            }
             auto & message = m_messages[index];
             for (const auto& sink : m_sinks)
             {
               sink->Log(message.m_level,message.m_ticks,message.m_msg.c_str());
             }
             --m_count;
-            m_writing_done[index].store(false);
+            m_state[index] -= 10000;
           }
-          m_writing_started[index].clear();
         }
       }
     }    
@@ -132,16 +130,15 @@ namespace Logger
       This->LoggerThreadRunner();
     }
     
-    std::atomic<int> m_count;
-    std::atomic<unsigned int> m_writer_index;
-    std::atomic<bool> m_quit;
-    std::atomic_flag m_writing_started[buckets];
-    std::atomic<bool> m_writing_done[buckets];
-    std::array<Message,buckets> m_messages;
+    std::atomic<int>             m_count;
+    std::atomic<unsigned int>    m_writer_index;
+    std::atomic<bool>            m_quit;
+    std::atomic<int>             m_state[buckets];
+    std::array<Message,buckets>  m_messages;
     std::vector<std::shared_ptr<ISink>> m_sinks;
-    std::mutex m_state_mutex;
-    std::condition_variable m_state_cv;
-    std::thread m_thread;
+    std::mutex                   m_state_mutex;
+    std::condition_variable      m_state_cv;
+    std::thread                  m_thread;
   };
 
   Logger::Logger(const Level level)
@@ -171,10 +168,10 @@ namespace Logger
     m_core->m_sinks.emplace_back(sink);
   }
 
-  void Logger::LogToSinks(const Level level, const std::string & msg) const
+  void Logger::LogToSinks(const Level level, std::string && msg) const
   {
     uint64_t ticks = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-    m_core->LogToSinks(ticks, level, msg);
+    m_core->LogToSinks(ticks, level, std::move(msg));
   }
   
   void Logger::Flush()

@@ -18,7 +18,7 @@ namespace Logger
                 : m_stream(stream)
             {}
 
-            void Log(const Level level, const uint64_t ticks, const char* msg) override;
+            void Log(const Level level, const uint64_t ticks, const std::string & msg) override;
             void Flush() override;
         private:
             std::ostream& m_stream;
@@ -34,7 +34,7 @@ namespace Logger
                 : m_path(path)
             {}
 
-            void Log(const Level level, const uint64_t ticks, const char* msg) override;
+            void Log(const Level level, const uint64_t ticks, const std::string & msg) override;
             void Flush() override;
         private:
             boost::filesystem::path m_path;
@@ -51,7 +51,7 @@ namespace Logger
                 , m_highwaterMark(highwaterMark)
             {}
 
-            void Log(const Level level, const uint64_t ticks, const char* msg) override;
+            void Log(const Level level, const uint64_t ticks, const std::string & msg) override;
             void Flush() override;
         private:
             std::shared_ptr<ISink> m_sink;
