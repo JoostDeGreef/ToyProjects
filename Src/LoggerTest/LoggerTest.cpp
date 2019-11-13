@@ -79,4 +79,37 @@ TEST_F(LoggerTest, Levels)
     logger.reset();
 }
 
+TEST_F(LoggerTest, StressTest)
+{
+    auto sink = std::make_shared<StoreSink>();
+    auto logger = Logger::Logger::Instance("Levels");
+    logger->AddSink(sink);
+
+    auto ProduceLogs = [&]() 
+    {
+        for (int i = 0; i < 1000; ++i)
+        {
+            logger->Warning("test {}",i);
+            std::this_thread::yield();
+        }
+    };
+
+    std::vector<std::thread> threads;
+    for (int i = 0; i < 100; ++i)
+    {
+        threads.emplace_back(ProduceLogs);
+    }
+
+    for (auto & t : threads)
+    {
+        t.join();
+    }
+
+    logger->Flush();
+
+    EXPECT_EQ(100*1000, sink->m_messages.size());
+
+    logger.reset();
+}
+
 

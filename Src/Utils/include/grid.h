@@ -301,7 +301,7 @@ public:
 
     // erase all matching values and return number of removed rows
     template<int INDEX = 0>
-    int erase_all(const typename std::tuple_element<INDEX, row_type>::type& key)
+    size_t erase_all(const typename std::tuple_element<INDEX, row_type>::type& key)
     {
         auto iters = find_all<INDEX>(key);
         std::vector<row_type const*> rows;
