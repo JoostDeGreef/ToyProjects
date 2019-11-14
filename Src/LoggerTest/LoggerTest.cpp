@@ -1,3 +1,5 @@
+#include <vector>
+#include <thread>
 #include "gtest/gtest.h"
 #include "Logger.h"
 #include "LoggerSinks.h"

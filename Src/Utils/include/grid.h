@@ -264,7 +264,7 @@ public:
     }
     template<int I0,int I1>
     auto find(const typename std::tuple_element<I0, row_type>::type& key0,
-              const typename std::tuple_element<I1, row_type>::type& key1) const
+              const typename std::tuple_element<I1, row_type>::type& key1) const -> decltype(end<I0>())
     {
         auto iters = find_all<I0>(key0);
         auto iter = std::find_if(std::get<0>(iters), std::get<1>(iters), [&key1](const grid_element<I0> & element)
@@ -289,7 +289,7 @@ public:
         return erase(iter);
     }
     template<int INDEX = 0>
-    bool erase(const typename std::tuple_element<INDEX, data_type>::type::iterator& iter)
+    bool erase(const typename std::tuple_element<INDEX, data_type>::type::const_iterator& iter)
     {
         if (iter != end<INDEX>())
         {
@@ -319,7 +319,7 @@ public:
     std::ostream& to_stream(std::ostream& s) const
     {
         s << "{";
-        char* open = "{";
+        std::string open = "{";
         for (const auto& row : std::get<0>(m_data))
         {
             s << open;
