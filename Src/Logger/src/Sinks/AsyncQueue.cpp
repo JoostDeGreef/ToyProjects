@@ -19,7 +19,7 @@ namespace Logger
         }
         void AsyncQueue::Flush()
         {
-            m_sink->FLush();
+            m_sink->Flush();
         }
     }
 }

@@ -45,6 +45,19 @@ TEST_F(LoggerTest, Console)
     logger.reset();
 }
 
+#ifdef WIN32
+TEST_F(LoggerTest, WinDBG)
+{
+    auto logger = Logger::Logger::Instance("WinDBG");
+    logger->SetLevel(Logger::Level::Info);
+    logger->AddSink<Logger::Sink::WinDebug>();
+
+    logger->Info("See if this line appear in the debugger.");
+
+    logger.reset();
+}
+#endif
+
 TEST_F(LoggerTest, File)
 {
     auto file = boost::filesystem::unique_path();
@@ -59,6 +72,28 @@ TEST_F(LoggerTest, File)
 
     std::ifstream f(file.c_str());
     int n = std::count(std::istreambuf_iterator<char>(f), std::istreambuf_iterator<char>(), '\n');
+    f.close();
+
+    boost::filesystem::remove(file);
+
+    EXPECT_EQ(1, n);
+}
+
+TEST_F(LoggerTest, AsyncQueue)
+{
+    auto file = boost::filesystem::unique_path();
+    auto logger = Logger::Logger::Instance("File");
+    logger->SetLevel(Logger::Level::Info);
+    logger->AddSink<Logger::Sink::AsyncQueue>(std::make_shared<Logger::Sink::File>(file),256);
+
+    logger->Debug("Is this {}?", "visible");
+    logger->Info("The magic number is {}", 42);
+
+    logger.reset();
+
+    std::ifstream f(file.c_str());
+    int n = std::count(std::istreambuf_iterator<char>(f), std::istreambuf_iterator<char>(), '\n');
+    f.close();
 
     boost::filesystem::remove(file);
 

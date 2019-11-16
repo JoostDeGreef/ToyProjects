@@ -11,7 +11,9 @@ link_libraries(Format
 add_library (${PROJECT_NAME} # SHARED
              "src/Logger.cpp"
              "src/Sinks/Console.cpp"
-             "src/Sinks/File.cpp")
+             "src/Sinks/File.cpp"
+			 "src/Sinks/AsyncQueue.cpp"
+			 "src/Sinks/WinDebug.cpp")
 
 set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${PROJECT_VERSION})
 

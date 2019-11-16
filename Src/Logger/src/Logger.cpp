@@ -58,6 +58,7 @@ namespace Logger
         ~LoggerCore()
         {
             StopThread();
+            m_sinks.clear();
         }
 
         void StartThread()
@@ -97,7 +98,7 @@ namespace Logger
                     if (state == 0)
                     {
                         m_messages[index].Set(ticks, level, std::move(msg));
-                        m_state[index].store(10000);
+                        m_state[index]+=10000-1;
                         m_state_cv.notify_one();
                         return;
                     }
@@ -116,10 +117,7 @@ namespace Logger
             int index = 0;
             while (!m_quit.load() || m_count.load() > 0)
             {
-                if (m_count.load() <= 0 && !m_quit.load())
-                {
-                    m_state_cv.wait(lock, [&]() { return m_count.load() > 0 || m_quit.load(); });
-                }
+                m_state_cv.wait(lock, [&]() { return m_count.load() > 0 || m_quit.load(); });
                 while (m_count.load() > 0)
                 {
                     index = (index + 1) % buckets;
@@ -130,8 +128,8 @@ namespace Logger
                         {
                             sink->Log(message.m_level, message.m_ticks, message.m_msg.c_str());
                         }
-                        --m_count;
                         m_state[index] -= 10000;
+                        --m_count;
                     }
                 }
             }

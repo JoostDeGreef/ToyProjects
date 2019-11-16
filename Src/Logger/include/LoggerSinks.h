@@ -62,6 +62,22 @@ namespace Logger
         };
 
 
+        // while running under the visual studio ide, or windbg, send
+        // debug messages
+#ifdef WIN32
+        class WinDebug final : public ISink
+        {
+        public:
+            WinDebug(std::shared_ptr<IFormatter> formatter = std::make_shared<Formatter::Simple>());
+            ~WinDebug();
+
+            void Log(const Level level, const uint64_t ticks, const std::string& msg) override;
+            void Flush() override;
+        private:
+            std::shared_ptr<IFormatter> m_formatter;
+        };
+#endif
+
         // Write to a file.
         // Files can be (too) slow, see AsyncQueue for a solution
         class File final : public ISink
