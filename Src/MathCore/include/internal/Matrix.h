@@ -133,6 +133,7 @@ public:
  
   auto operator + () const { return *(MatrixRowColumn*)(this); }
   auto & operator + () { return *(MatrixRowColumn*)(this); }
+  auto operator + (const ThisType& other) const { return MatrixRowColumn(*this) += other; }
   auto & operator += (const ThisType & other)
   {
     for(unsigned int i=0;i<Elements();++i)
@@ -141,9 +142,27 @@ public:
     }
     return *(MatrixRowColumn*)(this);
   }
-  auto operator + (const ThisType & other) const { return MatrixRowColumn(*this) += other; }
 
-protected:  
+  auto operator - (const ThisType& other) const { return MatrixRowColumn(*this) -= other; }
+  auto& operator -= (const ThisType& other)
+  {
+      for (unsigned int i = 0; i < Elements(); ++i)
+      {
+          Get()[i] -= other(i);
+      }
+      return *(MatrixRowColumn*)(this);
+  }
+  auto operator - () const
+  {
+      auto res(*this);
+      for (unsigned int i = 0; i < Elements(); ++i)
+      {
+          res(i) = -res(i);
+      }
+      return (MatrixRowColumn)(res);
+  }
+
+protected:
   using Data::Get;  
   using Data::Index;
   
@@ -176,6 +195,8 @@ public:
   using Functions::operator ();
   using Functions::operator +;
   using Functions::operator +=;
+  using Functions::operator -;
+  using Functions::operator -=;
 private:
 };
 
@@ -204,6 +225,8 @@ public:
   using Functions::operator ();
   using Functions::operator +;
   using Functions::operator +=;
+  using Functions::operator -;
+  using Functions::operator -=;
 private:
 };
 

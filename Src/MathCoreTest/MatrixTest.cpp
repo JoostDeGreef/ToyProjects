@@ -49,13 +49,25 @@ TEST_F(MatrixTest, Fill)
 
 TEST_F(MatrixTest, Plus)
 {
-    TMatrix<int> m1(2,2); m1.Fill(2);
-    TMatrix<int> m2(2,2); m2.Fill(3);
+    TMatrix<int> m1(2, 2); m1.Fill(2);
+    TMatrix<int> m2(2, 2); m2.Fill(3);
     TMatrix<int> m3 = m1 + m2;
     EXPECT_EQ(5, m3(1, 1));
     m3 += m1;
     EXPECT_EQ(7, m3(0, 1));
     auto m4 = +m1;
     EXPECT_EQ(2, m4(1, 0));
+}
+
+TEST_F(MatrixTest, Minus)
+{
+    TMatrix<int> m1(2, 2); m1.Fill(2);
+    TMatrix<int> m2(2, 2); m2.Fill(3);
+    TMatrix<int> m3 = m1 - m2;
+    EXPECT_EQ(-1, m3(1, 1));
+    m3 -= m1;
+    EXPECT_EQ(-3, m3(0, 1));
+    auto m4 = -m1;
+    EXPECT_EQ(-2, m4(1, 0));
 }
 
