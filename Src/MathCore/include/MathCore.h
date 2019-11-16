@@ -9,4 +9,5 @@
 #include "internal/Vector.h"
 #include "internal/Quaternion.h"
 #include "internal/RotationMatrix.h"
+#include "internal/Matrix.h"
 
