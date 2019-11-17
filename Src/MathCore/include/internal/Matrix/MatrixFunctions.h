@@ -138,9 +138,9 @@ public:
     template<typename M, typename std::enable_if<is_matrix<M>::value, int>::type = 0>
     auto operator * (const M& other) const
     {
-        //auto res = InstanceOuter<>
+        auto res = base.InstanceOuter<M>(other);
         //return MatrixRowColumn(*this) -= other;
-        return 0;
+        return res;
     }
     template<typename M, typename std::enable_if<is_matrix<M>::value, int>::type = 0>
     auto operator *= (const M& other)

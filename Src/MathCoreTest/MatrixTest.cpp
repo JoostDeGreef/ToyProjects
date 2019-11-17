@@ -97,3 +97,11 @@ TEST_F(MatrixTest, Transposed)
     EXPECT_EQ(3, m3.Rows());
 }
 
+TEST_F(MatrixTest, Multiply)
+{
+    TMatrix<int> m1(2, 2); m1.Fill(2);
+    TMatrix<int> m2(2, 2); m2.Fill(3);
+    TMatrix<int> m3 = m1 * m2;
+    EXPECT_EQ(6, m3(1, 1));
+}
+

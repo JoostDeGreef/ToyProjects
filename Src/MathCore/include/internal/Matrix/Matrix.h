@@ -9,7 +9,8 @@ public:
 protected:
     friend Functions;
     auto InstanceTransposed() { return ThisType(Columns(), Rows()); }
-
+    template<typename M>
+    auto InstanceOuter(const M& m) { return ThisType(Rows(), m.Columns()); }
 public:
     TMatrix() : TMatrix(0, 0) {}
     TMatrix(const unsigned int rows, const unsigned int columns, const Element def)
