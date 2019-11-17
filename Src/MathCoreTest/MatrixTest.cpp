@@ -71,3 +71,29 @@ TEST_F(MatrixTest, Minus)
     EXPECT_EQ(-2, m4(1, 0));
 }
 
+TEST_F(MatrixTest, Transpose)
+{
+    TMatrix<int> m1(2, 2);
+    m1(0, 1) = 1;
+    EXPECT_EQ(1, m1.Transpose()(1, 0));
+    TMatrix<int> m2(2, 3);
+    m2(0, 1) = 1;
+    m2.Transpose();
+    EXPECT_EQ(1, m2(1, 0));
+    EXPECT_EQ(2, m2.Columns());
+    EXPECT_EQ(3, m2.Rows());
+}
+
+TEST_F(MatrixTest, Transposed)
+{
+    TMatrix<int> m1(2, 2);
+    m1(0, 1) = 1;
+    EXPECT_EQ(1, m1.Transposed()(1, 0));
+    TMatrix<int> m2(2, 3);
+    m2(0, 1) = 1;
+    auto m3 = m2.Transposed();
+    EXPECT_EQ(1, m3(1, 0));
+    EXPECT_EQ(2, m3.Columns());
+    EXPECT_EQ(3, m3.Rows());
+}
+
