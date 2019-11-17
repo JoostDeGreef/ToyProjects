@@ -11,12 +11,12 @@ struct TMatrixCRTPHelper
     }
 };
 
-template<typename ELEMENT,template<typename> typename MATRIX>
-class TMatrixFunctions : TMatrixCRTPHelper<MATRIX<ELEMENT>>
+template<typename ELEMENT,typename MATRIX>
+class TMatrixFunctions : TMatrixCRTPHelper<MATRIX>
 {
 public:
     using Element = ELEMENT;
-    using Matrix = typename MATRIX<Element>;
+    using Matrix = MATRIX;
     using ThisType = TMatrixFunctions<Element,MATRIX>;
 
 protected:

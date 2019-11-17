@@ -1,14 +1,14 @@
 template<typename ELEMENT>
-class TMatrix : public TMatrixFunctions<ELEMENT,TMatrix>
+class TMatrix : public TMatrixFunctions<ELEMENT,TMatrix<ELEMENT>>
 {
 public:
     using Element = ELEMENT;
     using ThisType = TMatrix<Element>;
-    using Functions = TMatrixFunctions<ELEMENT,TMatrix>;
+    using Functions = TMatrixFunctions<Element,ThisType>;
 
 protected:
     friend Functions;
-    ThisType InstanceTransposed() { return ThisType(Columns(), Rows()); }
+    auto InstanceTransposed() { return ThisType(Columns(), Rows()); }
 
 public:
     TMatrix() : TMatrix(0, 0) {}

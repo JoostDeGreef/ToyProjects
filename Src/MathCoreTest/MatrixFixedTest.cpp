@@ -29,7 +29,7 @@ TEST_F(MatrixFixedTest, Copy)
 {
     TMatrixFixed<int,2,2> m1;
     m1.Fill(1);
-    TMatrixFixed<int,2,2> m2;
+    TMatrixFixed<int,2,2> m2(m1);
     EXPECT_EQ(1, m2(0, 1));
 }
 
