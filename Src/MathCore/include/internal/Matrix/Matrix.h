@@ -31,6 +31,8 @@ public:
     using Functions::operator +=;
     using Functions::operator -;
     using Functions::operator -=;
+    using Functions::operator *;
+    using Functions::operator *=;
 private:
 };
 

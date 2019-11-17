@@ -112,6 +112,20 @@ public:
     //
     // *
     //
+    auto operator * (const ThisType& other) const
+    {
+        TestColumnsVersusRows(other);
+        //auto res = Instance<>
+        //return MatrixRowColumn(*this) -= other;
+        return 0;
+    }
+    auto operator *= (const ThisType& other)
+    {
+        TestColumnsVersusRows(other);
+        //auto res = Instance<>
+        //return MatrixRowColumn(*this) -= other;
+        return 0;
+    }
 
 protected:
     using Data::Get;
@@ -119,12 +133,14 @@ protected:
     using Data::Instance;
 
 private:
-    inline void TestSize(const unsigned int rows, const unsigned int columns) const
-    {
-        assert(rows == Rows() && columns == Columns());
-    }
-    inline void TestSize(const ThisType& other) const
-    {
-        TestSize(other.Rows(), other.Columns());
-    }
+    inline void TestSize(const unsigned int rows, const unsigned int columns) const { assert(rows == Rows() && columns == Columns()); }
+    inline void TestSize(const ThisType& other) const { TestSize(other.Rows(), other.Columns()); }
+    inline void TestRowSize(const unsigned int rows) const { assert(rows == Rows()); }
+    inline void TestRowSize(const ThisType& other) const { TestRowSize(other.Rows()); }
+    inline void TestColumnSize(const unsigned int rows, const unsigned int columns) const { assert(columns == Columns()); }
+    inline void TestColumnSize(const ThisType& other) const { TestColumnSize(other.Columns()); }
+    inline void TestColumnsVersusRows(const unsigned int rows) const { assert(rows == Columns()); }
+    inline void TestColumnsVersusRows(const ThisType& other) const { TestColumnsVersusRows(other.Rows()); }
+    inline void TestRowsVersusColumns(const unsigned int columns) const { assert(columns == Rows()); }
+    inline void TestRowsVersusColumns(const ThisType& other) const { TestRowsVersusColumns(other.Columns()); }
 };

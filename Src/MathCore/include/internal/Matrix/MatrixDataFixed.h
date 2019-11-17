@@ -21,7 +21,7 @@ public:
 
     static auto Instance(unsigned int, unsigned int)
     {
-        return TMatrix<Element, ROWS, COLUMNS>();
+        return TMatrixFixed<Element, ROWS, COLUMNS>();
     }
 
     inline unsigned int Columns() const { return COLUMNS; }
@@ -36,12 +36,12 @@ public:
 
     auto& Transpose()
     {
-        static_assert(m_rows == m_columns);
-        for (unsigned int row = 0; row < m_rows; ++row)
+        static_assert(ROWS == COLUMNS);
+        for (unsigned int row = 0; row < ROWS; ++row)
         {
-            for (unsigned int column = row + 1; column < m_columns; ++column)
+            for (unsigned int column = row + 1; column < COLUMNS; ++column)
             {
-                std::swap(data[Index(column, row)], m_data[Index(row, column)]);
+                std::swap(m_data[Index(column, row)], m_data[Index(row, column)]);
             }
         }
         return *(MatrixRowColumn*)this;
