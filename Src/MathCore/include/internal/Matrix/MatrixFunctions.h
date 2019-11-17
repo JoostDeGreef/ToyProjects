@@ -90,11 +90,13 @@ public:
     {
         return base;
     }
-    auto operator + (const ThisType& other) const
+    template<typename M, typename std::enable_if<is_matrix<M>::value, int>::type = 0>
+    auto operator + (const M& other) const
     {
         return Matrix(base) += other;
     }
-    auto& operator += (const ThisType& other)
+    template<typename M, typename std::enable_if<is_matrix<M>::value,int>::type = 0>
+    auto& operator += (const M& other)
     {
         for (unsigned int i = 0; i < base.Elements(); ++i)
         {
@@ -106,11 +108,13 @@ public:
     //
     // -
     //
-    auto operator - (const ThisType& other) const
+    template<typename M, typename std::enable_if<is_matrix<M>::value, int>::type = 0>
+    auto operator - (const M& other) const
     {
         return Matrix(base) -= other.base;
     }
-    auto& operator -= (const ThisType& other)
+    template<typename M, typename std::enable_if<is_matrix<M>::value, int>::type = 0>
+    auto& operator -= (const M& other)
     {
         for (unsigned int i = 0; i < base.Elements(); ++i)
         {
@@ -131,13 +135,15 @@ public:
     //
     // *
     //
-    auto operator * (const ThisType& other) const
+    template<typename M, typename std::enable_if<is_matrix<M>::value, int>::type = 0>
+    auto operator * (const M& other) const
     {
-        //auto res = Instance<>
+        //auto res = InstanceOuter<>
         //return MatrixRowColumn(*this) -= other;
         return 0;
     }
-    auto operator *= (const ThisType& other)
+    template<typename M, typename std::enable_if<is_matrix<M>::value, int>::type = 0>
+    auto operator *= (const M& other)
     {
         //auto res = Instance<>
         //return MatrixRowColumn(*this) -= other;
