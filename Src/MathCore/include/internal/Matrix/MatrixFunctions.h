@@ -1,25 +1,29 @@
-template<typename DATA>
-class TMatrixFunctions : public DATA
+template <typename T>
+struct TMatrixCRTPHelper
+{
+    T& Base() 
+    { 
+        return static_cast<T&>(*this); 
+    }
+    T const& Base() const 
+    { 
+        return static_cast<T const&>(*this); 
+    }
+};
+
+template<typename ELEMENT,template<typename> typename MATRIX>
+class TMatrixFunctions : TMatrixCRTPHelper<MATRIX<ELEMENT>>
 {
 public:
-    using Data = DATA;
-    using Element = typename Data::Element;
-    using ThisType = TMatrixFunctions<Data>;
-    using MatrixColumnColumn = typename Data::MatrixColumnColumn;
-    using MatrixColumnRow = typename Data::MatrixColumnRow;
-    using MatrixRowColumn = typename Data::MatrixRowColumn;
-    using MatrixRowRow = typename Data::MatrixRowRow;
+    using Element = ELEMENT;
+    using Matrix = typename MATRIX<Element>;
+    using ThisType = TMatrixFunctions<Element,MATRIX>;
 
-    TMatrixFunctions() : TMatrixFunctions(0, 0) {}
-    TMatrixFunctions(const unsigned int rows, const unsigned int columns) : Data(rows, columns) {}
-    TMatrixFunctions(const unsigned int rows, const unsigned int columns, const Element & def) : Data(rows, columns, def) {}
-    TMatrixFunctions(const ThisType& other) : Data(other) {}
-    TMatrixFunctions(ThisType&& other) : Data(other) {}
+protected:
+    Matrix& base;
 
-    using Data::operator ();
-    using Data::Columns;
-    using Data::Rows;
-    using Data::Elements;
+public:
+    TMatrixFunctions() : base(this->Base()) {}
 
     //
     // Clear
@@ -34,25 +38,42 @@ public:
     //
     void Fill(const Element& value)
     {
-        for (unsigned int i = 0; i < Elements(); ++i)
+        for (unsigned int i = 0; i < base.Elements(); ++i)
         {
-            Get()[i] = value;
+            base(i) = value;
         }
     }
 
     //
     // Transpose / Transposed
     //
-    using Data::Transpose;
+    auto& Transpose()
+    {
+        if (base.Rows() == base.Columns())
+        {
+            for (unsigned int row = 0; row < base.Rows(); ++row)
+            {
+                for (unsigned int column = row + 1; column < base.Columns(); ++column)
+                {
+                    std::swap(base(column, row), base(row, column));
+                }
+            }
+        }
+        else
+        {
+            base = Transposed();
+        }
+        return base;
+    }
     auto Transposed() const
     {
-        auto res = MatrixColumnRow::Instance(Columns(),Rows());
+        auto res = base.InstanceTransposed();
         unsigned int index = 0;
-        for (unsigned int column = 0; column < Columns(); ++column)
+        for (unsigned int column = 0; column < base.Columns(); ++column)
         {
-            for (unsigned int row = 0; row < Rows(); ++row, ++index)
+            for (unsigned int row = 0; row < base.Rows(); ++row, ++index)
             {
-                res(index) = (*this)(row, column);
+                res(index) = base(row, column);
             }
         }
         return res;
@@ -63,24 +84,23 @@ public:
     //
     auto operator + () const
     {
-        return *(MatrixRowColumn*)(this);
+        return base;
     }
     const auto& operator + ()
     {
-        return *(MatrixRowColumn*)(this);
+        return base;
     }
     auto operator + (const ThisType& other) const
     {
-        return MatrixRowColumn(*this) += other;
+        return Matrix(base) += other;
     }
     auto& operator += (const ThisType& other)
     {
-        other.TestSize(*this);
-        for (unsigned int i = 0; i < Elements(); ++i)
+        for (unsigned int i = 0; i < base.Elements(); ++i)
         {
-            Get()[i] += other(i);
+            base(i) += other.base(i);
         }
-        return *(MatrixRowColumn*)(this);
+        return base;
     }
 
     //
@@ -88,25 +108,24 @@ public:
     //
     auto operator - (const ThisType& other) const
     {
-        return MatrixRowColumn(*this) -= other;
+        return Matrix(base) -= other.base;
     }
     auto& operator -= (const ThisType& other)
     {
-        other.TestSize(*this);
-        for (unsigned int i = 0; i < Elements(); ++i)
+        for (unsigned int i = 0; i < base.Elements(); ++i)
         {
-            Get()[i] -= other(i);
+            base(i) -= other.base(i);
         }
-        return *(MatrixRowColumn*)(this);
+        return *(Matrix*)(this);
     }
     auto operator - () const
     {
-        auto res(*this);
-        for (unsigned int i = 0; i < Elements(); ++i)
+        auto res(base);
+        for (unsigned int i = 0; i < base.Elements(); ++i)
         {
             res(i) = -res(i);
         }
-        return (MatrixRowColumn)(res);
+        return res;
     }
 
     //
@@ -114,33 +133,14 @@ public:
     //
     auto operator * (const ThisType& other) const
     {
-        TestColumnsVersusRows(other);
         //auto res = Instance<>
         //return MatrixRowColumn(*this) -= other;
         return 0;
     }
     auto operator *= (const ThisType& other)
     {
-        TestColumnsVersusRows(other);
         //auto res = Instance<>
         //return MatrixRowColumn(*this) -= other;
         return 0;
     }
-
-protected:
-    using Data::Get;
-    using Data::Index;
-    using Data::Instance;
-
-private:
-    inline void TestSize(const unsigned int rows, const unsigned int columns) const { assert(rows == Rows() && columns == Columns()); }
-    inline void TestSize(const ThisType& other) const { TestSize(other.Rows(), other.Columns()); }
-    inline void TestRowSize(const unsigned int rows) const { assert(rows == Rows()); }
-    inline void TestRowSize(const ThisType& other) const { TestRowSize(other.Rows()); }
-    inline void TestColumnSize(const unsigned int rows, const unsigned int columns) const { assert(columns == Columns()); }
-    inline void TestColumnSize(const ThisType& other) const { TestColumnSize(other.Columns()); }
-    inline void TestColumnsVersusRows(const unsigned int rows) const { assert(rows == Columns()); }
-    inline void TestColumnsVersusRows(const ThisType& other) const { TestColumnsVersusRows(other.Rows()); }
-    inline void TestRowsVersusColumns(const unsigned int columns) const { assert(columns == Rows()); }
-    inline void TestRowsVersusColumns(const ThisType& other) const { TestRowsVersusColumns(other.Columns()); }
 };
