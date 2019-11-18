@@ -12,7 +12,7 @@ struct TMatrixCRTPHelper
 };
 
 template<typename ELEMENT,typename MATRIX>
-class TMatrixFunctions : TMatrixCRTPHelper<MATRIX>
+class TMatrixFunctions : public TMatrixCRTPHelper<MATRIX>
 {
 public:
     using Element = ELEMENT;
@@ -138,7 +138,7 @@ public:
     template<typename M, typename std::enable_if<is_matrix<M>::value, int>::type = 0>
     auto operator * (const M& other) const
     {
-        auto res = base.InstanceOuter<M>(other);
+        auto res = base.InstanceOuter(other);
         //return MatrixRowColumn(*this) -= other;
         return res;
     }
