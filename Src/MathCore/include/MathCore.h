@@ -2,6 +2,7 @@
 
 #include <limits>
 #include <random>
+#include <type_traits>
 #include <initializer_list>
 
 #include "internal/Constants.h"

@@ -8,6 +8,7 @@ public:
 
 protected:
     friend Functions;
+                         auto InstanceDiag() const { return ThisType(std::min(Columns(),Rows()),1); }
                          auto InstanceTransposed() const { return ThisType(Columns(), Rows()); }
     template<typename M> auto InstanceOuter(const M& m) const { return ThisType(Rows(), m.Columns()); }
                          auto InstanceLogic() const { return TMatrix<bool>(Rows(), Columns()); }

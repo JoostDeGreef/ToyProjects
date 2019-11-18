@@ -8,9 +8,11 @@ public:
 
 protected:
     friend Functions;
+    auto InstanceDiag() const { return TMatrixFixed<ELEMENT, std::min(COLUMNS, ROWS),1>(); }
     auto InstanceTransposed() const { return TMatrixFixed<ELEMENT, COLUMNS, ROWS>(); }
-    template<typename E,unsigned int R,unsigned int C>
-    auto InstanceOuter(const TMatrixFixed<E,R,C>& m) const { return TMatrixFixed<ELEMENT,ROWS,C>(); }
+    template<unsigned int R,unsigned int C>
+    auto InstanceOuter(const TMatrixFixed<ELEMENT,R,C>& m) const { return TMatrixFixed<ELEMENT,ROWS,C>(); }
+    auto InstanceOuter(const TMatrix<ELEMENT>& m) const { return TMatrix<ELEMENT>(ROWS, m.Columns()); }
     auto InstanceLogic() const { return TMatrixFixed<bool, COLUMNS, ROWS>(); }
     // todo: if M is static, these should be static asserts
     template<typename M> void assert_inner(const M& m) const { assert(Columns()==m.Rows()); }

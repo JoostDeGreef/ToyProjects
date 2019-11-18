@@ -54,6 +54,22 @@ TEST_F(MatrixTest, Fill)
     EXPECT_EQ(1, m(1, 1));
 }
 
+TEST_F(MatrixTest, Eye)
+{
+    TMatrix<int> m(3, 2);
+    m.Eye();
+    EXPECT_EQ(1, m(1, 1));
+    EXPECT_EQ(0, m(2, 1));
+}
+
+TEST_F(MatrixTest, Diag)
+{
+    TMatrix<int> m1(3,2,{ 1,2,3,4,5,6 });
+    auto res = m1.Diag();
+    EXPECT_EQ(1, res(0));
+    EXPECT_EQ(4, res(1));
+}
+
 TEST_F(MatrixTest, Plus)
 {
     TMatrix<int> m1(2, 2); m1.Fill(2);

@@ -26,22 +26,98 @@ public:
     TMatrixFunctions() : base(this->Base()) {}
 
     //
+    // Perform logic operator on each element of this
+    //
+    template<typename F>
+    auto PerformLogicOperator(const F& f) const
+    {
+        auto res = base.InstanceLogic();
+        for (unsigned int index = 0; index < base.Elements(); ++index)
+        {
+            res(index) = f(base(index));
+        }
+        return res;
+    }
+    //
+    // Perform logic operator on each element of this and other
+    //
+    template<typename M, typename F, typename std::enable_if<is_matrix<M>::value, int>::type = 0>
+    auto PerformLogicOperator(const M& other, const F& f) const
+    {
+        base.assert_size(other);
+        auto res = base.InstanceLogic();
+        for (unsigned int index = 0; index < base.Elements(); ++index)
+        {
+            res(index) = f(base(index), other.base(index));
+        }
+        return res;
+    }
+    //
+    // Perform operator on each element of this
+    //
+    template<typename F>
+    auto& PerformOperator(const F& f)
+    {
+        for (unsigned int index = 0; index < base.Elements(); ++index)
+        {
+            base(index) = f(base(index));
+        }
+        return base;
+    }
+    //
+    // Perform operator on each element of this and other
+    //
+    template<typename M, typename F, typename std::enable_if<is_matrix<M>::value, int>::type = 0>
+    auto& PerformOperator(const M& other, const F& f)
+    {
+        base.assert_size(other);
+        for (unsigned int index = 0; index < base.Elements(); ++index)
+        {
+            base(index) = f(base(index), other.base(index));
+        }
+        return base;
+    }
+
+    //
     // Clear
     //
-    void Clear()
+    auto& Clear()
     {
-        Fill(Element());
+        return Fill(Element());
     }
 
     //
     // Fill
     //
-    void Fill(const Element& value)
+    auto& Fill(const Element& value)
     {
-        for (unsigned int i = 0; i < base.Elements(); ++i)
+        return PerformOperator([&value](const Element&) {return value; });
+    }
+
+    //
+    // Fill diagonal with one, rest with zero
+    //
+    auto& Eye()
+    {
+        Clear();
+        for (unsigned int i = 0; i < base.Rows() && i < base.Columns(); ++i)
         {
-            base(i) = value;
+            base(i, i) = Element(1);
         }
+        return base;
+    }
+
+    //
+    // Extract diagonal as column vector
+    //
+    auto Diag()
+    {
+        auto res = base.InstanceDiag();
+        for (unsigned int i = 0; i < base.Rows() && i < base.Columns(); ++i)
+        {
+            res(i) = base(i, i);
+        }
+        return res;
     }
 
     //
@@ -88,11 +164,7 @@ public:
     }
     auto & operator += (const Element& shift)
     {
-        for (unsigned int i = 0; i < base.Elements(); ++i)
-        {
-            base(i) += shift;
-        }        
-        return base;
+        return PerformOperator([&shift](const Element& a) {return a + shift; });
     }
     auto operator + () const
     {
@@ -102,19 +174,15 @@ public:
     {
         return base;
     }
-    template<typename M, typename std::enable_if<is_matrix<M>::value, int>::type = 0>
+    template<typename M>
     auto operator + (const M& other) const
     {
         return Matrix(base) += other;
     }
-    template<typename M, typename std::enable_if<is_matrix<M>::value,int>::type = 0>
+    template<typename M>
     auto& operator += (const M& other)
     {
-        for (unsigned int i = 0; i < base.Elements(); ++i)
-        {
-            base(i) += other.base(i);
-        }
-        return base;
+        return PerformOperator(other, [](const Element& a, const Element& b) {return a + b; });
     }
 
     //
@@ -126,34 +194,21 @@ public:
     }
     auto & operator -= (const Element& shift)
     {
-        for (unsigned int i = 0; i < base.Elements(); ++i)
-        {
-            base(i) -= shift;
-        }        
-        return base;
+        return PerformOperator([&shift](const Element& a) {return a - shift; });
     }
-    template<typename M, typename std::enable_if<is_matrix<M>::value, int>::type = 0>
+    template<typename M>
     auto operator - (const M& other) const
     {
         return Matrix(base) -= other.base;
     }
-    template<typename M, typename std::enable_if<is_matrix<M>::value, int>::type = 0>
+    template<typename M>
     auto& operator -= (const M& other)
     {
-        for (unsigned int i = 0; i < base.Elements(); ++i)
-        {
-            base(i) -= other.base(i);
-        }
-        return *(Matrix*)(this);
+        return PerformOperator(other, [](const Element& a, const Element& b) {return a - b; });
     }
     auto operator - () const
     {
-        auto res(base);
-        for (unsigned int i = 0; i < base.Elements(); ++i)
-        {
-            res(i) = -res(i);
-        }
-        return res;
+        return Matrix(base).PerformOperator([](const Element& a) {return -a; });
     }
 
     //
@@ -165,11 +220,7 @@ public:
     }
     auto & operator *= (const Element& scale)
     {
-        for (unsigned int i = 0; i < base.Elements(); ++i)
-        {
-            base(i) *= scale;
-        }        
-        return base;
+        return PerformOperator([&scale](const Element& a) {return a * scale; });
     }
     template<typename M, typename std::enable_if<is_matrix<M>::value, int>::type = 0>
     auto operator * (const M& other) const
@@ -196,50 +247,112 @@ public:
     }
     
     //
-    // equality operators
+    // equality operators between matrices
     //
-private:
-    template<typename M, typename F, typename std::enable_if<is_matrix<M>::value, int>::type = 0>
-    auto PerformLogicOperator(const M& other, const F& f) const
-    {
-        base.assert_size(other);
-        auto res = base.InstanceLogic();
-        for (unsigned int index = 0; index < base.Elements(); ++index)
-        {
-            res(index) = f(base(index),other.base(index));
-        }
-        return res;
-    }
-public:
     template<typename M>
     auto operator == (const M& other) const
     {
-        return PerformLogicOperator(other,[](Element & a, Element b){ return a == b; });
+        return PerformLogicOperator(other,[](const Element & a, const Element & b){ return a == b; });
     }
     template<typename M>
     auto operator != (const M& other) const
     {
-        return PerformLogicOperator(other,[](Element & a, Element b){ return a != b; });
+        return PerformLogicOperator(other,[](const Element & a, const Element & b){ return a != b; });
     }
     template<typename M>
     auto operator > (const M& other) const
     {
-        return PerformLogicOperator(other,[](Element & a, Element b){ return a > b; });
+        return PerformLogicOperator(other,[](const Element & a, const Element & b){ return a > b; });
     }
     template<typename M>
     auto operator >= (const M& other) const
     {
-        return PerformLogicOperator(other,[](Element & a, Element b){ return a >= b; });
+        return PerformLogicOperator(other,[](const Element & a, const Element & b){ return a >= b; });
     }
     template<typename M>
     auto operator < (const M& other) const
     {
-        return PerformLogicOperator(other,[](Element & a, Element b){ return a < b; });
+        return PerformLogicOperator(other,[](const Element & a, const Element & b){ return a < b; });
     }
     template<typename M>
     auto operator <= (const M& other) const
     {
-        return PerformLogicOperator(other,[](Element & a, Element b){ return a <= b; });
+        return PerformLogicOperator(other,[](const Element & a, const Element & b){ return a <= b; });
     }
+
+    //
+    // Equality operators between matrix elements and value
+    //
+    auto operator == (const Element & e) const
+    {
+        return PerformLogicOperator([&e](const Element& a) { return a == e; });
+    }
+    auto operator != (const Element& e) const
+    {
+        return PerformLogicOperator([&e](const Element& a) { return a != e; });
+    }
+    auto operator > (const Element& e) const
+    {
+        return PerformLogicOperator([&e](const Element& a) { return a > e; });
+    }
+    auto operator >= (const Element& e) const
+    {
+        return PerformLogicOperator([&e](const Element& a) { return a >= e; });
+    }
+    auto operator < (const Element& e) const
+    {
+        return PerformLogicOperator([&e](const Element& a) { return a < e; });
+    }
+    auto operator <= (const Element& e) const
+    {
+        return PerformLogicOperator([&e](const Element& a) { return a <= e; });
+    }
+
+    //
+    // Bitwise operators (only valid when Element is integer type)
+    //
+    template<typename std::enable_if<std::is_integral<Element>::value, int>::type = 0>
+    auto operator ~ () const
+    {
+        return Matrix(base).PerformOperator([](const Element& a) {return ~a; });
+    }
+    auto operator | (const Element& e) const
+    {
+        return Matrix(base) |= e;
+    }
+    template<typename std::enable_if<std::is_integral<Element>::value, int>::type = 0>
+    auto& operator |= (const Element & e)
+    {
+        return PerformOperator([&e](const Element& a) {return a | e; });
+    }
+    template<typename M>
+    auto operator | (const M& other) const
+    {
+        return Matrix(base) |= e;
+    }
+    template<typename M, typename std::enable_if<std::is_integral<Element>::value, int>::type = 0>
+    auto& operator |= (const M & other)
+    {
+        return PerformOperator([](const Element& a, const Element& b) {return a | b; });
+    }
+
+    //
+    // Logic operators (only valid when Element is bool)
+    //
+    //template<typename std::enable_if<std::is_same<Element, bool>::value, int>::type = 0>
+    //auto operator ! () const
+    //{
+    //    return Matrix(base).PerformOperator([](const Element& a) {return !a; });
+    //}
+    //template<typename std::enable_if<std::is_same<Element, bool>::value, int>::type = 0>
+    //auto operator || (const Element& e) const
+    //{
+    //    return PerformOperator([&e](const Element& a) {return a || e; });
+    //}
+    //template<typename M, typename std::enable_if<std::is_same<Element, bool>::value, int>::type = 0>
+    //auto operator || (const M& other) const
+    //{
+    //    return PerformOperator([](const Element& a, const Element& b) {return a || b; });
+    //}
 };
 
