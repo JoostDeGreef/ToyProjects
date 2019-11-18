@@ -82,6 +82,18 @@ public:
     //
     // +
     //
+    auto operator + (const Element& shift) const
+    {
+        return Matrix(base) += shift;
+    }
+    auto & operator += (const Element& shift)
+    {
+        for (unsigned int i = 0; i < base.Elements(); ++i)
+        {
+            base(i) += shift;
+        }        
+        return base;
+    }
     auto operator + () const
     {
         return base;
@@ -108,6 +120,18 @@ public:
     //
     // -
     //
+    auto operator - (const Element& shift) const
+    {
+        return Matrix(base) -= shift;
+    }
+    auto & operator -= (const Element& shift)
+    {
+        for (unsigned int i = 0; i < base.Elements(); ++i)
+        {
+            base(i) -= shift;
+        }        
+        return base;
+    }
     template<typename M, typename std::enable_if<is_matrix<M>::value, int>::type = 0>
     auto operator - (const M& other) const
     {
@@ -135,18 +159,87 @@ public:
     //
     // *
     //
+    auto operator * (const Element& scale) const
+    {
+        return Matrix(base) *= scale;
+    }
+    auto & operator *= (const Element& scale)
+    {
+        for (unsigned int i = 0; i < base.Elements(); ++i)
+        {
+            base(i) *= scale;
+        }        
+        return base;
+    }
     template<typename M, typename std::enable_if<is_matrix<M>::value, int>::type = 0>
     auto operator * (const M& other) const
     {
+        base.assert_inner(other);
         auto res = base.InstanceOuter(other);
-        //return MatrixRowColumn(*this) -= other;
+        for (unsigned int row = 0; row < base.Rows(); ++row)
+        {
+            for( unsigned int col = 0; col < other.Columns(); ++col)
+            {
+                Element & element = res(row,col);
+                for( unsigned int inner = 0; inner < base.Columns(); ++inner)
+                {
+                    element += base(row,inner)*other.base(inner,col);
+                }
+            }
+        }
         return res;
     }
     template<typename M, typename std::enable_if<is_matrix<M>::value, int>::type = 0>
     auto operator *= (const M& other)
     {
-        //auto res = Instance<>
-        //return MatrixRowColumn(*this) -= other;
-        return 0;
+        return base = base * other;
+    }
+    
+    //
+    // equality operators
+    //
+private:
+    template<typename M, typename F, typename std::enable_if<is_matrix<M>::value, int>::type = 0>
+    auto PerformLogicOperator(const M& other, const F& f) const
+    {
+        base.assert_size(other);
+        auto res = base.InstanceLogic();
+        for (unsigned int index = 0; index < base.Elements(); ++index)
+        {
+            res(index) = f(base(index),other.base(index));
+        }
+        return res;
+    }
+public:
+    template<typename M>
+    auto operator == (const M& other) const
+    {
+        return PerformLogicOperator(other,[](Element & a, Element b){ return a == b; });
+    }
+    template<typename M>
+    auto operator != (const M& other) const
+    {
+        return PerformLogicOperator(other,[](Element & a, Element b){ return a != b; });
+    }
+    template<typename M>
+    auto operator > (const M& other) const
+    {
+        return PerformLogicOperator(other,[](Element & a, Element b){ return a > b; });
+    }
+    template<typename M>
+    auto operator >= (const M& other) const
+    {
+        return PerformLogicOperator(other,[](Element & a, Element b){ return a >= b; });
+    }
+    template<typename M>
+    auto operator < (const M& other) const
+    {
+        return PerformLogicOperator(other,[](Element & a, Element b){ return a < b; });
+    }
+    template<typename M>
+    auto operator <= (const M& other) const
+    {
+        return PerformLogicOperator(other,[](Element & a, Element b){ return a <= b; });
     }
 };
+

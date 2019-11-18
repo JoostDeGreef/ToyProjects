@@ -91,3 +91,85 @@ TEST_F(MatrixFixedTest, Transposed)
     EXPECT_EQ(3, m3.Rows());
 }
 
+TEST_F(MatrixFixedTest, Multiply)
+{
+    TMatrixFixed<int,2,2> m1; m1.Fill(2);
+    TMatrixFixed<int,2,2> m2; m2.Fill(3);
+    TMatrixFixed<int,2,2> m3 = m1 * m2;
+    EXPECT_EQ(12, m3(1, 1));
+    m1 *= m2;
+    EXPECT_EQ(12, m1(0, 1));
+    auto m4 = m1 * 3;
+    EXPECT_EQ(36, m4(1, 0));
+    m4 *= 2;
+    EXPECT_EQ(72, m4(0, 0));
+}
+
+TEST_F(MatrixFixedTest, Equality)
+{
+    TMatrixFixed<int,2,2> m1({1,2,3,4});
+    TMatrixFixed<int,2,2> m2({1,1,3,4});
+    auto res = m1 == m2;
+    EXPECT_TRUE(res(0, 0));
+    EXPECT_FALSE(res(0, 1));
+    EXPECT_TRUE(res(1, 0));
+    EXPECT_TRUE(res(1, 1));
+}
+
+TEST_F(MatrixFixedTest, Inquality)
+{
+    TMatrixFixed<int,2,2> m1({1,2,3,4});
+    TMatrixFixed<int,2,2> m2({1,1,3,4});
+    auto res = m1 != m2;
+    EXPECT_FALSE(res(0, 0));
+    EXPECT_TRUE(res(0, 1));
+    EXPECT_FALSE(res(1, 0));
+    EXPECT_FALSE(res(1, 1));
+}
+
+TEST_F(MatrixFixedTest, Smaller)
+{
+    TMatrixFixed<int,2,2> m1({1,2,3,3});
+    TMatrixFixed<int,2,2> m2({1,1,3,4});
+    auto res = m1 < m2;
+    EXPECT_FALSE(res(0, 0));
+    EXPECT_FALSE(res(0, 1));
+    EXPECT_FALSE(res(1, 0));
+    EXPECT_TRUE(res(1, 1));
+}
+
+TEST_F(MatrixFixedTest, SmallerOrEqual)
+{
+    TMatrixFixed<int,2,2> m1({1,2,3,3});
+    TMatrixFixed<int,2,2> m2({1,1,3,4});
+    auto res = m1 <= m2;
+    EXPECT_TRUE(res(0, 0));
+    EXPECT_FALSE(res(0, 1));
+    EXPECT_TRUE(res(1, 0));
+    EXPECT_TRUE(res(1, 1));
+}
+
+TEST_F(MatrixFixedTest, Greater)
+{
+    TMatrixFixed<int,2,2> m1({1,2,3,3});
+    TMatrixFixed<int,2,2> m2({1,1,3,4});
+    auto res = m1 > m2;
+    EXPECT_FALSE(res(0, 0));
+    EXPECT_TRUE(res(0, 1));
+    EXPECT_FALSE(res(1, 0));
+    EXPECT_FALSE(res(1, 1));
+}
+
+TEST_F(MatrixFixedTest, GreaterOrEqual)
+{
+    TMatrixFixed<int,2,2> m1({1,2,3,3});
+    TMatrixFixed<int,2,2> m2({1,1,3,4});
+    auto res = m1 >= m2;
+    EXPECT_TRUE(res(0, 0));
+    EXPECT_TRUE(res(0, 1));
+    EXPECT_TRUE(res(1, 0));
+    EXPECT_FALSE(res(1, 1));
+}
+
+
+

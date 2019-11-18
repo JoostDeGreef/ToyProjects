@@ -6,9 +6,9 @@ link_libraries(GoogleTest
                MathCore)
 
 add_executable (${PROJECT_NAME}
+                "MatrixTest.cpp"
+                "MatrixFixedTest.cpp"
                 "VectorTest.cpp"
                 "QuaternionTest.cpp"
-                "MathCoreTest.cpp"
-                "MatrixFixedTest.cpp"
-                "MatrixTest.cpp")
+                "MathCoreTest.cpp")
 

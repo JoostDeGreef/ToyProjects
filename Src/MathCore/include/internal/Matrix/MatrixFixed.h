@@ -8,10 +8,20 @@ public:
 
 protected:
     friend Functions;
-    auto InstanceTransposed() { return TMatrixFixed<ELEMENT, COLUMNS, ROWS>(); }
+    auto InstanceTransposed() const { return TMatrixFixed<ELEMENT, COLUMNS, ROWS>(); }
+    template<typename E,unsigned int R,unsigned int C>
+    auto InstanceOuter(const TMatrixFixed<E,R,C>& m) const { return TMatrixFixed<ELEMENT,ROWS,C>(); }
+    auto InstanceLogic() const { return TMatrixFixed<bool, COLUMNS, ROWS>(); }
+    // todo: if M is static, these should be static asserts
+    template<typename M> void assert_inner(const M& m) const { assert(Columns()==m.Rows()); }
+    template<typename M> void assert_outer(const M& m) const { assert(Rows()==m.Columns()); }
+    template<typename M> void assert_size(const M& m) const { assert(Rows()==m.Rows() && Columns()==m.Columns()); }
 
 public:
     TMatrixFixed() : TMatrixFixed(Element()) {}
+    TMatrixFixed(const std::array<Element,ROWS*COLUMNS> & data)
+        : m_data(data)
+    {}
     TMatrixFixed(const Element def)
     {
         m_data.fill(def);

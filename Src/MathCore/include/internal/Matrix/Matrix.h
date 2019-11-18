@@ -8,11 +8,22 @@ public:
 
 protected:
     friend Functions;
-    auto InstanceTransposed() { return ThisType(Columns(), Rows()); }
-    template<typename M>
-    auto InstanceOuter(const M& m) { return ThisType(Rows(), m.Columns()); }
+                         auto InstanceTransposed() const { return ThisType(Columns(), Rows()); }
+    template<typename M> auto InstanceOuter(const M& m) const { return ThisType(Rows(), m.Columns()); }
+                         auto InstanceLogic() const { return TMatrix<bool>(Rows(), Columns()); }
+    template<typename M> void assert_inner(const M& m) const { assert(Columns()==m.Rows()); }
+    template<typename M> void assert_outer(const M& m) const { assert(Rows()==m.Columns()); }
+    template<typename M> void assert_size(const M& m) const { assert(Rows()==m.Rows() && Columns()==m.Columns()); }
+    
 public:
     TMatrix() : TMatrix(0, 0) {}
+    TMatrix(const unsigned int rows, const unsigned int columns, const std::initializer_list<Element> & elements)
+        : m_data(elements)
+        , m_columns(columns)
+        , m_rows(rows)
+    {
+      assert(columns*rows==m_data.size());
+    }
     TMatrix(const unsigned int rows, const unsigned int columns, const Element def)
         : m_data(columns* rows, def)
         , m_columns(columns)
@@ -52,10 +63,10 @@ public:
     inline unsigned int Elements() const { return m_rows * m_columns; }
     inline unsigned int Index(const unsigned int row, const unsigned int column) const { return row * m_columns + column; }
 
-    inline Element& operator () (const unsigned int row, const unsigned int column) { return m_data[Index(row, column)]; }
-    inline Element operator () (const unsigned int row, const unsigned int column) const { return m_data[Index(row, column)]; }
-    inline Element& operator () (const unsigned int index) { return m_data[index]; }
-    inline Element operator () (const unsigned int index) const { return m_data[index]; }
+    inline typename std::vector<Element>::reference operator () (const unsigned int row, const unsigned int column) { return m_data[Index(row, column)]; }
+    inline typename std::vector<Element>::const_reference operator () (const unsigned int row, const unsigned int column) const { return m_data[Index(row, column)]; }
+    inline typename std::vector<Element>::reference operator () (const unsigned int index) { return m_data[index]; }
+    inline typename std::vector<Element>::const_reference operator () (const unsigned int index) const { return m_data[index]; }
 
 private:
     std::vector<Element> m_data;

@@ -2,6 +2,7 @@
 
 #include <limits>
 #include <random>
+#include <initializer_list>
 
 #include "internal/Constants.h"
 #include "internal/Limits.h"
