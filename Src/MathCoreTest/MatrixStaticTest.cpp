@@ -5,7 +5,7 @@
 using namespace std;
 using namespace testing;
 
-class MatrixFixedTest : public Test
+class MatrixStaticTest : public Test
 {
 protected:
     virtual void SetUp()
@@ -19,55 +19,55 @@ protected:
     const double eps = 0.00000001;
 };
 
-TEST_F(MatrixFixedTest, Constructor)
+TEST_F(MatrixStaticTest, Constructor)
 {
-    TMatrixFixed<int,2,2> m;
+    TMatrix<int,2,2> m;
     EXPECT_EQ(0, m(0, 0));
 }
 
-TEST_F(MatrixFixedTest, Copy)
+TEST_F(MatrixStaticTest, Copy)
 {
-    TMatrixFixed<int,2,2> m1;
+    TMatrix<int,2,2> m1;
     m1.Fill(1);
-    TMatrixFixed<int,2,2> m2(m1);
+    TMatrix<int,2,2> m2(m1);
     EXPECT_EQ(1, m2(0, 1));
 }
 
-TEST_F(MatrixFixedTest, Clear)
+TEST_F(MatrixStaticTest, Clear)
 {
-    TMatrixFixed<int,2,2> m;
+    TMatrix<int,2,2> m;
     m.Clear();
     EXPECT_EQ(0, m(0, 1));
 }
 
-TEST_F(MatrixFixedTest, Fill)
+TEST_F(MatrixStaticTest, Fill)
 {
-    TMatrixFixed<int,2,2> m;
+    TMatrix<int,2,2> m;
     m.Fill(1);
     EXPECT_EQ(1, m(1, 1));
 }
 
-TEST_F(MatrixFixedTest, Eye)
+TEST_F(MatrixStaticTest, Eye)
 {
-    TMatrixFixed<int,3,2> m;
+    TMatrix<int,3,2> m;
     m.Eye();
     EXPECT_EQ(1, m(1, 1));
     EXPECT_EQ(0, m(2, 1));
 }
 
-TEST_F(MatrixFixedTest, Diag)
+TEST_F(MatrixStaticTest, Diag)
 {
-    TMatrixFixed<int, 3, 2> m1({ 1,2,3,4,5,6 });
+    TMatrix<int, 3, 2> m1({ 1,2,3,4,5,6 });
     auto res = m1.Diag();
     EXPECT_EQ(1,res(0));
     EXPECT_EQ(4,res(1));
 }
 
-TEST_F(MatrixFixedTest, Plus)
+TEST_F(MatrixStaticTest, Plus)
 {
-    TMatrixFixed<int,2,2> m1; m1.Fill(2);
-    TMatrixFixed<int,2,2> m2; m2.Fill(3);
-    TMatrixFixed<int,2,2> m3 = m1 + m2;
+    TMatrix<int,2,2> m1; m1.Fill(2);
+    TMatrix<int,2,2> m2; m2.Fill(3);
+    TMatrix<int,2,2> m3 = m1 + m2;
     EXPECT_EQ(5, m3(1, 1));
     m3 += m1;
     EXPECT_EQ(7, m3(0, 1));
@@ -75,11 +75,11 @@ TEST_F(MatrixFixedTest, Plus)
     EXPECT_EQ(2, m4(1, 0));
 }
 
-TEST_F(MatrixFixedTest, Minus)
+TEST_F(MatrixStaticTest, Minus)
 {
-    TMatrixFixed<int,2,2> m1; m1.Fill(2);
-    TMatrixFixed<int,2,2> m2; m2.Fill(3);
-    TMatrixFixed<int,2,2> m3 = m1 - m2;
+    TMatrix<int,2,2> m1; m1.Fill(2);
+    TMatrix<int,2,2> m2; m2.Fill(3);
+    TMatrix<int,2,2> m3 = m1 - m2;
     EXPECT_EQ(-1, m3(1, 1));
     m3 -= m1;
     EXPECT_EQ(-3, m3(0, 1));
@@ -87,19 +87,19 @@ TEST_F(MatrixFixedTest, Minus)
     EXPECT_EQ(-2, m4(1, 0));
 }
 
-TEST_F(MatrixFixedTest, Transpose)
+TEST_F(MatrixStaticTest, Transpose)
 {
-    TMatrixFixed<int,2,2> m1;
+    TMatrix<int,2,2> m1;
     m1(0, 1) = 1;
     EXPECT_EQ(1, m1.Transpose()(1, 0));
 }
 
-TEST_F(MatrixFixedTest, Transposed)
+TEST_F(MatrixStaticTest, Transposed)
 {
-    TMatrixFixed<int,2,2> m1;
+    TMatrix<int,2,2> m1;
     m1(0, 1) = 1;
     EXPECT_EQ(1, m1.Transposed()(1, 0));
-    TMatrixFixed<int,2,3> m2;
+    TMatrix<int,2,3> m2;
     m2(0, 1) = 1;
     auto m3 = m2.Transposed();
     EXPECT_EQ(1, m3(1, 0));
@@ -107,11 +107,11 @@ TEST_F(MatrixFixedTest, Transposed)
     EXPECT_EQ(3, m3.Rows());
 }
 
-TEST_F(MatrixFixedTest, Multiply)
+TEST_F(MatrixStaticTest, Multiply)
 {
-    TMatrixFixed<int,2,2> m1; m1.Fill(2);
-    TMatrixFixed<int,2,2> m2; m2.Fill(3);
-    TMatrixFixed<int,2,2> m3 = m1 * m2;
+    TMatrix<int,2,2> m1; m1.Fill(2);
+    TMatrix<int,2,2> m2; m2.Fill(3);
+    TMatrix<int,2,2> m3 = m1 * m2;
     EXPECT_EQ(12, m3(1, 1));
     m1 *= m2;
     EXPECT_EQ(12, m1(0, 1));
@@ -121,10 +121,10 @@ TEST_F(MatrixFixedTest, Multiply)
     EXPECT_EQ(72, m4(0, 0));
 }
 
-TEST_F(MatrixFixedTest, Equality)
+TEST_F(MatrixStaticTest, Equality)
 {
-    TMatrixFixed<int,2,2> m1({1,2,3,4});
-    TMatrixFixed<int,2,2> m2({1,1,3,4});
+    TMatrix<int,2,2> m1({1,2,3,4});
+    TMatrix<int,2,2> m2({1,1,3,4});
     auto res = m1 == m2;
     EXPECT_TRUE(res(0, 0));
     EXPECT_FALSE(res(0, 1));
@@ -132,10 +132,10 @@ TEST_F(MatrixFixedTest, Equality)
     EXPECT_TRUE(res(1, 1));
 }
 
-TEST_F(MatrixFixedTest, Inquality)
+TEST_F(MatrixStaticTest, Inquality)
 {
-    TMatrixFixed<int,2,2> m1({1,2,3,4});
-    TMatrixFixed<int,2,2> m2({1,1,3,4});
+    TMatrix<int,2,2> m1({1,2,3,4});
+    TMatrix<int,2,2> m2({1,1,3,4});
     auto res = m1 != m2;
     EXPECT_FALSE(res(0, 0));
     EXPECT_TRUE(res(0, 1));
@@ -143,10 +143,10 @@ TEST_F(MatrixFixedTest, Inquality)
     EXPECT_FALSE(res(1, 1));
 }
 
-TEST_F(MatrixFixedTest, Smaller)
+TEST_F(MatrixStaticTest, Smaller)
 {
-    TMatrixFixed<int,2,2> m1({1,2,3,3});
-    TMatrixFixed<int,2,2> m2({1,1,3,4});
+    TMatrix<int,2,2> m1({1,2,3,3});
+    TMatrix<int,2,2> m2({1,1,3,4});
     auto res = m1 < m2;
     EXPECT_FALSE(res(0, 0));
     EXPECT_FALSE(res(0, 1));
@@ -154,10 +154,10 @@ TEST_F(MatrixFixedTest, Smaller)
     EXPECT_TRUE(res(1, 1));
 }
 
-TEST_F(MatrixFixedTest, SmallerOrEqual)
+TEST_F(MatrixStaticTest, SmallerOrEqual)
 {
-    TMatrixFixed<int,2,2> m1({1,2,3,3});
-    TMatrixFixed<int,2,2> m2({1,1,3,4});
+    TMatrix<int,2,2> m1({1,2,3,3});
+    TMatrix<int,2,2> m2({1,1,3,4});
     auto res = m1 <= m2;
     EXPECT_TRUE(res(0, 0));
     EXPECT_FALSE(res(0, 1));
@@ -165,10 +165,10 @@ TEST_F(MatrixFixedTest, SmallerOrEqual)
     EXPECT_TRUE(res(1, 1));
 }
 
-TEST_F(MatrixFixedTest, Greater)
+TEST_F(MatrixStaticTest, Greater)
 {
-    TMatrixFixed<int,2,2> m1({1,2,3,3});
-    TMatrixFixed<int,2,2> m2({1,1,3,4});
+    TMatrix<int,2,2> m1({1,2,3,3});
+    TMatrix<int,2,2> m2({1,1,3,4});
     auto res = m1 > m2;
     EXPECT_FALSE(res(0, 0));
     EXPECT_TRUE(res(0, 1));
@@ -176,10 +176,10 @@ TEST_F(MatrixFixedTest, Greater)
     EXPECT_FALSE(res(1, 1));
 }
 
-TEST_F(MatrixFixedTest, GreaterOrEqual)
+TEST_F(MatrixStaticTest, GreaterOrEqual)
 {
-    TMatrixFixed<int,2,2> m1({1,2,3,3});
-    TMatrixFixed<int,2,2> m2({1,1,3,4});
+    TMatrix<int,2,2> m1({1,2,3,3});
+    TMatrix<int,2,2> m2({1,1,3,4});
     auto res = m1 >= m2;
     EXPECT_TRUE(res(0, 0));
     EXPECT_TRUE(res(0, 1));
