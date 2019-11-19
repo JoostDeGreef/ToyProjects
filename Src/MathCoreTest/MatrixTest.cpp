@@ -208,3 +208,32 @@ TEST_F(MatrixTest, GreaterOrEqual)
     EXPECT_FALSE(res(1, 1));
 }
 
+TEST_F(MatrixTest, BitInvert)
+{
+    TMatrix<unsigned int> m1(2, 2, {1,2,4,8});
+    auto res = ~m1;
+    EXPECT_TRUE(res(0)!=0);
+    EXPECT_TRUE(res(1)!=0);
+    EXPECT_TRUE(res(2)!=0);
+    EXPECT_TRUE(res(3)!=0);
+    EXPECT_EQ(0,res(0)&1);
+    EXPECT_EQ(0,res(1)&2);
+    EXPECT_EQ(0,res(2)&4);
+    EXPECT_EQ(0,res(3)&8);
+}
+
+TEST_F(MatrixTest, BitOr)
+{
+    TMatrix<unsigned int> m1(2, 2, {1,2,4,8});
+    auto res = m1 | 3;
+    EXPECT_EQ(3,res(0));
+    EXPECT_EQ(3,res(1));
+    EXPECT_EQ(7,res(2));
+    EXPECT_EQ(11,res(3));
+    m1 |= 3;
+    EXPECT_EQ(3,m1(0));
+    EXPECT_EQ(3,m1(1));
+    EXPECT_EQ(7,m1(2));
+    EXPECT_EQ(11,m1(3));
+}
+

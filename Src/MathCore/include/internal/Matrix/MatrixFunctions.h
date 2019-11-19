@@ -174,12 +174,12 @@ public:
     {
         return base;
     }
-    template<typename M>
+    template<typename M, typename std::enable_if<is_matrix<M>::value, int>::type = 0>
     auto operator + (const M& other) const
     {
         return Matrix(base) += other;
     }
-    template<typename M>
+    template<typename M, typename std::enable_if<is_matrix<M>::value, int>::type = 0>
     auto& operator += (const M& other)
     {
         return PerformOperator(other, [](const Element& a, const Element& b) {return a + b; });
@@ -196,12 +196,12 @@ public:
     {
         return PerformOperator([&shift](const Element& a) {return a - shift; });
     }
-    template<typename M>
+    template<typename M, typename std::enable_if<is_matrix<M>::value, int>::type = 0>
     auto operator - (const M& other) const
     {
         return Matrix(base) -= other.base;
     }
-    template<typename M>
+    template<typename M, typename std::enable_if<is_matrix<M>::value, int>::type = 0>
     auto& operator -= (const M& other)
     {
         return PerformOperator(other, [](const Element& a, const Element& b) {return a - b; });
@@ -249,32 +249,32 @@ public:
     //
     // equality operators between matrices
     //
-    template<typename M>
+    template<typename M, typename std::enable_if<is_matrix<M>::value, int>::type = 0>
     auto operator == (const M& other) const
     {
         return PerformLogicOperator(other,[](const Element & a, const Element & b){ return a == b; });
     }
-    template<typename M>
+    template<typename M, typename std::enable_if<is_matrix<M>::value, int>::type = 0>
     auto operator != (const M& other) const
     {
         return PerformLogicOperator(other,[](const Element & a, const Element & b){ return a != b; });
     }
-    template<typename M>
+    template<typename M, typename std::enable_if<is_matrix<M>::value, int>::type = 0>
     auto operator > (const M& other) const
     {
         return PerformLogicOperator(other,[](const Element & a, const Element & b){ return a > b; });
     }
-    template<typename M>
+    template<typename M, typename std::enable_if<is_matrix<M>::value, int>::type = 0>
     auto operator >= (const M& other) const
     {
         return PerformLogicOperator(other,[](const Element & a, const Element & b){ return a >= b; });
     }
-    template<typename M>
+    template<typename M, typename std::enable_if<is_matrix<M>::value, int>::type = 0>
     auto operator < (const M& other) const
     {
         return PerformLogicOperator(other,[](const Element & a, const Element & b){ return a < b; });
     }
-    template<typename M>
+    template<typename M, typename std::enable_if<is_matrix<M>::value, int>::type = 0>
     auto operator <= (const M& other) const
     {
         return PerformLogicOperator(other,[](const Element & a, const Element & b){ return a <= b; });
@@ -325,15 +325,15 @@ public:
     {
         return PerformOperator([&e](const Element& a) {return a | e; });
     }
-    template<typename M>
+    template<typename M, typename std::enable_if<is_matrix<M>::value, int>::type = 0>
     auto operator | (const M& other) const
     {
-        return Matrix(base) |= e;
+        return Matrix(base) |= other;
     }
-    template<typename M, typename std::enable_if<std::is_integral<Element>::value, int>::type = 0>
+    template<typename M, typename std::enable_if<is_matrix<M>::value && std::is_integral<Element>::value, int>::type = 0>
     auto& operator |= (const M & other)
     {
-        return PerformOperator([](const Element& a, const Element& b) {return a | b; });
+        return PerformOperator(other,[](const Element& a, const Element& b) {return a | b; });
     }
 
     //
