@@ -1,18 +1,5 @@
-template <typename T>
-struct TMatrixCRTPHelper
-{
-    T& Base() 
-    { 
-        return static_cast<T&>(*this); 
-    }
-    T const& Base() const 
-    { 
-        return static_cast<T const&>(*this); 
-    }
-};
-
 template<typename ELEMENT,typename MATRIX>
-class TMatrixFunctions : public TMatrixCRTPHelper<MATRIX>
+class TMatrixFunctions 
 {
 public:
     using Element = ELEMENT;
@@ -23,7 +10,7 @@ protected:
     Matrix& base;
 
 public:
-    TMatrixFunctions() : base(this->Base()) {}
+    TMatrixFunctions() : base(static_cast<Matrix&>(*this)) {}
 
     //
     // Perform logic operator on each element of this
@@ -123,6 +110,7 @@ public:
     //
     // Transpose / Transposed
     //
+    template<typename DUMMY = int, typename std::enable_if<is_dynamic_matrix<Matrix>::value || is_square_static_matrix<Matrix>::value, DUMMY>::type = 0>
     auto& Transpose()
     {
         if (base.Rows() == base.Columns())
@@ -311,7 +299,7 @@ public:
     //
     // Bitwise operators (only valid when Element is integer type)
     //
-    template<typename std::enable_if<std::is_integral<Element>::value, int>::type = 0>
+    template<typename DUMMY = int, typename std::enable_if<std::is_integral<Element>::value, DUMMY>::type = 0>
     auto operator ~ () const
     {
         return Matrix(base).PerformOperator([](const Element& a) {return ~a; });
@@ -320,7 +308,7 @@ public:
     {
         return Matrix(base) |= e;
     }
-    template<typename std::enable_if<std::is_integral<Element>::value, int>::type = 0>
+    template<typename DUMMY = int, typename std::enable_if<std::is_integral<Element>::value, DUMMY>::type = 0>
     auto& operator |= (const Element & e)
     {
         return PerformOperator([&e](const Element& a) {return a | e; });
@@ -335,24 +323,62 @@ public:
     {
         return PerformOperator(other,[](const Element& a, const Element& b) {return a | b; });
     }
+    auto operator & (const Element& e) const
+    {
+        return Matrix(base) &= e;
+    }
+    template<typename DUMMY = int, typename std::enable_if<std::is_integral<Element>::value, DUMMY>::type = 0>
+    auto& operator &= (const Element & e)
+    {
+        return PerformOperator([&e](const Element& a) {return a & e; });
+    }
+    template<typename M, typename std::enable_if<is_matrix<M>::value, int>::type = 0>
+    auto operator & (const M& other) const
+    {
+        return Matrix(base) &= other;
+    }
+    template<typename M, typename std::enable_if<is_matrix<M>::value && std::is_integral<Element>::value, int>::type = 0>
+    auto& operator &= (const M & other)
+    {
+        return PerformOperator(other,[](const Element& a, const Element& b) {return a & b; });
+    }
+    auto operator ^ (const Element& e) const
+    {
+        return Matrix(base) ^= e;
+    }
+    template<typename std::enable_if<std::is_integral<Element>::value, int>::type = 0>
+    auto& operator ^= (const Element & e)
+    {
+        return PerformOperator([&e](const Element& a) {return a ^ e; });
+    }
+    template<typename M, typename std::enable_if<is_matrix<M>::value, int>::type = 0>
+    auto operator ^ (const M& other) const
+    {
+        return Matrix(base) ^= other;
+    }
+    template<typename M, typename std::enable_if<is_matrix<M>::value && std::is_integral<Element>::value, int>::type = 0>
+    auto& operator ^= (const M & other)
+    {
+        return PerformOperator(other,[](const Element& a, const Element& b) {return a ^ b; });
+    }
 
     //
     // Logic operators (only valid when Element is bool)
     //
-    //template<typename std::enable_if<std::is_same<Element, bool>::value, int>::type = 0>
-    //auto operator ! () const
-    //{
-    //    return Matrix(base).PerformOperator([](const Element& a) {return !a; });
-    //}
-    //template<typename std::enable_if<std::is_same<Element, bool>::value, int>::type = 0>
-    //auto operator || (const Element& e) const
-    //{
-    //    return PerformOperator([&e](const Element& a) {return a || e; });
-    //}
-    //template<typename M, typename std::enable_if<std::is_same<Element, bool>::value, int>::type = 0>
-    //auto operator || (const M& other) const
-    //{
-    //    return PerformOperator([](const Element& a, const Element& b) {return a || b; });
-    //}
+    template<typename DUMMY = int, typename std::enable_if<std::is_same<Element, bool>::value, DUMMY>::type = 0>
+    auto operator ! () const
+    {
+        return Matrix(base).PerformOperator([](const Element& a) {return !a; });
+    }
+    template<typename DUMMY = int, typename std::enable_if<std::is_same<Element, bool>::value, DUMMY>::type = 0>
+    auto operator || (const Element& e) const
+    {
+        return PerformOperator([&e](const Element& a) {return a || e; });
+    }
+    template<typename M, typename std::enable_if<std::is_same<typename M::Element, bool>::value, int>::type = 0>
+    auto operator || (const M& other) const
+    {
+        return PerformOperator([](const Element& a, const Element& b) {return a || b; });
+    }
 };
 

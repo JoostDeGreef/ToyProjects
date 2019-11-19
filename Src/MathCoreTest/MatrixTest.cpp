@@ -237,3 +237,18 @@ TEST_F(MatrixTest, BitOr)
     EXPECT_EQ(11,m1(3));
 }
 
+TEST_F(MatrixTest, BitAnd)
+{
+    TMatrix<unsigned int> m1(2, 2, {1,2,4,8});
+    auto res = m1 & 3;
+    EXPECT_EQ(1,res(0));
+    EXPECT_EQ(2,res(1));
+    EXPECT_EQ(0,res(2));
+    EXPECT_EQ(0,res(3));
+    m1 &= 3;
+    EXPECT_EQ(1,m1(0));
+    EXPECT_EQ(2,m1(1));
+    EXPECT_EQ(0,m1(2));
+    EXPECT_EQ(0,m1(3));
+}
+
