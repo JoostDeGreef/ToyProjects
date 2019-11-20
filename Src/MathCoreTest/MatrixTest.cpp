@@ -259,10 +259,49 @@ TEST_F(MatrixTest, BitAnd)
     EXPECT_EQ(0,m1(3));
 }
 
+TEST_F(MatrixTest, Cofactor)
+{
+    auto m0 = TMatrix<int>(3, 3, { 1,2,3, 0,4,5, 1,0,6 }).Cofactor();
+    EXPECT_EQ(24, m0(0));
+    EXPECT_EQ(5, m0(1));
+    EXPECT_EQ(-4, m0(2));
+    EXPECT_EQ(-12, m0(3));
+    EXPECT_EQ(3, m0(4));
+    EXPECT_EQ(2, m0(5));
+    EXPECT_EQ(-2, m0(6));
+    EXPECT_EQ(-5, m0(7));
+    EXPECT_EQ(4, m0(8));
+}
+
 TEST_F(MatrixTest, Determinant)
 {
-    EXPECT_EQ(8,TMatrix<unsigned int>(1, 1, {8}).Determinant());    
-    EXPECT_EQ(-2,TMatrix<unsigned int>(2, 2, {1,2, 3,4}).Determinant());    
-    EXPECT_EQ(18,TMatrix<unsigned int>(3, 3, {1,2,3, 4,5,6, 7,8,3}).Determinant());    
-    EXPECT_EQ(112,TMatrix<unsigned int>(4, 4, {1,2,3,4, 5,6,7,8, 9,10,12,11, 13,14,1,2}).Determinant());    
+    EXPECT_EQ(8,TMatrix<int>(1, 1, {8}).Determinant());    
+    EXPECT_EQ(-2,TMatrix<int>(2, 2, {1,2,
+                                     3,4}).Determinant());    
+    EXPECT_EQ(18,TMatrix<int>(3, 3, {1,2,3,
+                                     4,5,6,
+                                     7,8,3}).Determinant());    
+    EXPECT_EQ(112,TMatrix<int>(4, 4, {1,2,3,4,
+                                      5,6,7,8,
+                                      9,10,12,11,
+                                      13,14,1,2}).Determinant());    
 }
+
+TEST_F(MatrixTest, Inverse)
+{
+    auto m0 = TMatrix<int>(3, 3, { 1,2,3,
+                                   2,5,11,
+                                   3,6,10 });
+    auto m1 = m0.Inverse();
+    auto m2 = m0 * m1;
+    EXPECT_EQ(1, m2(0));
+    EXPECT_EQ(0, m2(1));
+    EXPECT_EQ(0, m2(2));
+    EXPECT_EQ(0, m2(3));
+    EXPECT_EQ(1, m2(4));
+    EXPECT_EQ(0, m2(5));
+    EXPECT_EQ(0, m2(6));
+    EXPECT_EQ(0, m2(7));
+    EXPECT_EQ(1, m2(8));
+}
+
