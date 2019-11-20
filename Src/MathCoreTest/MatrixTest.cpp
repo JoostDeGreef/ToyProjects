@@ -70,6 +70,13 @@ TEST_F(MatrixTest, Diag)
     EXPECT_EQ(4, res(1));
 }
 
+TEST_F(MatrixTest, Trace)
+{
+    TMatrix<int> m1(3,2,{ 2,3,4,5,6,7 });
+    auto res = m1.Trace();
+    EXPECT_EQ(10, res);
+}
+
 TEST_F(MatrixTest, Plus)
 {
     TMatrix<int> m1(2, 2); m1.Fill(2);
@@ -252,3 +259,10 @@ TEST_F(MatrixTest, BitAnd)
     EXPECT_EQ(0,m1(3));
 }
 
+TEST_F(MatrixTest, Determinant)
+{
+    EXPECT_EQ(8,TMatrix<unsigned int>(1, 1, {8}).Determinant());    
+    EXPECT_EQ(-2,TMatrix<unsigned int>(2, 2, {1,2, 3,4}).Determinant());    
+    EXPECT_EQ(18,TMatrix<unsigned int>(3, 3, {1,2,3, 4,5,6, 7,8,3}).Determinant());    
+    EXPECT_EQ(112,TMatrix<unsigned int>(4, 4, {1,2,3,4, 5,6,7,8, 9,10,12,11, 13,14,1,2}).Determinant());    
+}

@@ -97,12 +97,25 @@ public:
     //
     // Extract diagonal as column vector
     //
-    auto Diag()
+    auto Diag() const
     {
         auto res = base.InstanceDiag();
         for (unsigned int i = 0; i < base.Rows() && i < base.Columns(); ++i)
         {
             res(i) = base(i, i);
+        }
+        return res;
+    }
+
+    //
+    // Multiply all the diagnal elements
+    //
+    Element Trace() const
+    {
+        Element res = base(0, 0);
+        for (unsigned int i = 1; i < base.Rows() && i < base.Columns(); ++i)
+        {
+            res *= base(i, i);
         }
         return res;
     }
@@ -380,5 +393,104 @@ public:
     {
         return PerformOperator([](const Element& a, const Element& b) {return a || b; });
     }
+    
+    //
+    // Calculate Matrix Minor for position
+    //
+    auto Minor(const unsigned int row, const unsigned int column) const
+    {
+      assert(row<base.Rows() && column<base.Columns());
+      auto dst = base.InstanceMinor();
+      auto CopyBlock = [&](const unsigned int r,const unsigned int c,const unsigned int rc,const unsigned int cc,const unsigned int ro,const unsigned int co)
+      {
+        for(unsigned int ri=r;ri<r+rc;++ri)
+        {
+          for(unsigned int ci=c;ci<c+cc;++ci)
+          {
+            dst(ri-ro,ci-co) = base(ri,ci);
+          }
+        }
+      };
+      CopyBlock(0,    0,       row,              column,                 0,0);
+      CopyBlock(0,    column+1,row,              base.Columns()-column-1,0,1);
+      CopyBlock(row+1,0,       base.Rows()-row-1,column,                 1,0);
+      CopyBlock(row+1,column+1,base.Rows()-row-1,base.Columns()-column-1,1,1);
+      return dst;
+    }
+    
+    //
+    // Calculate the Minor Value (determinant of the Minor Matrix)
+    //
+    Element MinorValue(const unsigned int row, const unsigned int column) const
+    {
+      assert(row<base.Rows() && column<base.Columns());
+      base.assert_square();
+      switch(base.Rows())
+      {
+        case 0:
+        case 1:
+          return 0;
+        case 2:
+          return base((1-row),(1-column));
+        case 3:
+        {
+          unsigned int r0 = (row==0) ? 1 : 0;
+          unsigned int r1 = (row==1) ? 2 : 1;
+          unsigned int c0 = (column==0) ? 1 : 0;
+          unsigned int c1 = (column==1) ? 2 : 1;
+          return base(r0,c0)*base(r1,c1) - base(r0,c1)*base(r1,c0);
+        }
+        default:
+          return base.Minor(row,column).Determinant();
+      }
+    }
+
+    //
+    // Calculate the Cofactor matrix
+    //
+    auto Cofactor() const
+    {
+      auto res = base.Instance();
+      for(unsigned int r=0;r<base.Rows();++r)
+      {
+        for(unsigned int c=0;c<base.Columns();++c)
+        {
+          const auto m = base.MinorValue(r,c);
+          res(r,c) = (r&1)==(c&1)?m:-m;
+        }
+      }
+      return res;
+    }
+    
+    //
+    // Calculate the determinant    
+    //
+    Element Determinant() const
+    {
+      base.assert_square();
+      switch(base.Rows())
+      {
+        case 0:
+          return 0;
+        case 1:
+          return base(0);
+        case 2:
+          return base(0)*base(3)-base(1)*base(2);
+        case 3:
+          return base(0)*(base(4)*base(8)-base(5)*base(7))
+               - base(1)*(base(3)*base(8)-base(5)*base(6))
+               + base(2)*(base(3)*base(7)-base(4)*base(6));
+        default:
+          break;
+      }
+      auto c = base.Cofactor();
+      auto res = c(0)*base(0);
+      for(unsigned int i=1;i<base.Elements();++i)
+      {
+        res += c(i)*base(i);
+      }
+      return res;
+    }
+    
 };
 

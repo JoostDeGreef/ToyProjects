@@ -8,16 +8,19 @@ public:
 
 protected:
     friend Functions;
+    auto Instance() const { return TMatrix<ELEMENT, ROWS, COLUMNS>(); }
     auto InstanceDiag() const { return TMatrix<ELEMENT, std::min(COLUMNS, ROWS),1>(); }
     auto InstanceTransposed() const { return TMatrix<ELEMENT, COLUMNS, ROWS>(); }
     template<unsigned int R,unsigned int C>
     auto InstanceOuter(const TMatrix<ELEMENT,R,C>& m) const { return TMatrix<ELEMENT,ROWS,C>(); }
     auto InstanceOuter(const TMatrix<ELEMENT,0,0>& m) const { return TMatrix<ELEMENT,0,0>(ROWS, m.Columns()); }
     auto InstanceLogic() const { return TMatrix<bool, COLUMNS, ROWS>(); }
+    auto InstanceMinor() const { return TMatrix<ELEMENT, (COLUMNS>0)?COLUMNS-1:0, (ROWS>0)?ROWS-1:0>(); }
     // todo: if M is static, these should be static asserts
     template<typename M> void assert_inner(const M& m) const { assert(Columns()==m.Rows()); }
     template<typename M> void assert_outer(const M& m) const { assert(Rows()==m.Columns()); }
     template<typename M> void assert_size(const M& m) const { assert(Rows()==m.Rows() && Columns()==m.Columns()); }
+                         void assert_square() const { assert(Rows()==Columns()); }
 
 public:
     TMatrix() : TMatrix(Element()) {}
@@ -70,13 +73,16 @@ public:
 
 protected:
     friend Functions;
+                         auto Instance() const { return ThisType(Rows(), Columns()); }
                          auto InstanceDiag() const { return ThisType(std::min(Columns(),Rows()),1); }
                          auto InstanceTransposed() const { return ThisType(Columns(), Rows()); }
     template<typename M> auto InstanceOuter(const M& m) const { return ThisType(Rows(), m.Columns()); }
                          auto InstanceLogic() const { return TMatrix<bool,0,0>(Rows(), Columns()); }
+                         auto InstanceMinor() const { return ThisType(Rows()>0?Rows()-1:0,Columns()>0?Columns()-1:0); }
     template<typename M> void assert_inner(const M& m) const { assert(Columns()==m.Rows()); }
     template<typename M> void assert_outer(const M& m) const { assert(Rows()==m.Columns()); }
     template<typename M> void assert_size(const M& m) const { assert(Rows()==m.Rows() && Columns()==m.Columns()); }
+                         void assert_square() const { assert(Rows()==Columns()); }
     
 public:
     TMatrix() : TMatrix(0, 0) {}
