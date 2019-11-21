@@ -305,3 +305,24 @@ TEST_F(MatrixTest, Inverse)
     EXPECT_EQ(1, m2(8));
 }
 
+TEST_F(MatrixTest, LUP)
+{
+    auto m0 = TMatrix<double>(3, 3, { 1,2,3,
+                                      4,5,6,
+                                      7,8,9 });
+    auto lup = m0.LUP();
+    auto l = lup.L();
+    auto u = lup.U();
+    auto p = lup.P();
+    auto m1 = l * u;
+    auto m2 = p * m0;
+    EXPECT_EQ(m1(0), m2(0));
+    EXPECT_EQ(m1(1), m2(1));
+    EXPECT_EQ(m1(2), m2(2));
+    EXPECT_EQ(m1(3), m2(3));
+    EXPECT_EQ(m1(4), m2(4));
+    EXPECT_EQ(m1(5), m2(5));
+    EXPECT_EQ(m1(6), m2(6));
+    EXPECT_EQ(m1(7), m2(7));
+    EXPECT_EQ(m1(8), m2(8));
+}
