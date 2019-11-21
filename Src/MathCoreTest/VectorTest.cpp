@@ -19,9 +19,9 @@ protected:
 TEST_F(VectorTest, DefaultConstructor)
 {
     Vector3d v3;
-    EXPECT_EQ(3, v3.dimension);
+    EXPECT_EQ(3, v3.Dimension());
     Vector2d v2;
-    EXPECT_EQ(2, v2.dimension);
+    EXPECT_EQ(2, v2.Dimension());
 }
 
 TEST_F(VectorTest, InitConstructor)
@@ -61,7 +61,7 @@ TEST_F(VectorTest, Cross)
 {
     Vector3d v0(1, 2, 1);
     Vector3d v1(2, 3, -2);
-    EXPECT_EQ(Vector3d(-7, 4, -1), v0.Cross(v1));
+    EXPECT_TRUE(Vector3d(-7, 4, -1).Equal(v0.Cross(v1)));
 }
 
 TEST_F(VectorTest, Add)

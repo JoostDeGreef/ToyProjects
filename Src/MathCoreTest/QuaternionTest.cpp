@@ -51,21 +51,21 @@ TEST_F(QuaternionTest, RotationMatrix)
         axis.Normalize();
         Quat q(axis, Constants::Pi);
         Vector3d res = Rotate(Vector3d(1, 0, 0), q);
-        EXPECT_EQ(Vector3d(-1, 0, 0), res);
+        EXPECT_TRUE(Vector3d(-1, 0, 0).Equal(res));
     }
     {
         Vector3d axis(1, 1, 0);
         axis.Normalize();
         Quat q(axis, Constants::Pi);
         Vector3d res = Rotate(Vector3d(1, 0, 0), q);
-        EXPECT_EQ(Vector3d(0, 1, 0), res);
+        EXPECT_TRUE(Vector3d(0, 1, 0).Equal(res));
     }
     {
         Vector3d axis(1, 12, 43);
         axis.Normalize();
         Quat q(axis, Constants::Pi * 8);
         Vector3d res = Rotate(Vector3d(1, 0, 0), q);
-        EXPECT_EQ(Vector3d(1, 0, 0), res);
+        EXPECT_TRUE(Vector3d(1, 0, 0).Equal(res));
     }
 }
 
@@ -77,9 +77,9 @@ TEST_F(QuaternionTest, Transform)
         Quat q(axis, 0);
         Vector3d v(0, 1, 0);
         v = q.Transform(v);
-        EXPECT_EQ(Vector3d(0, 1, 0), v);
+        EXPECT_TRUE(Vector3d(0, 1, 0).Equal(v));
         v = q.InverseTransform(v);
-        EXPECT_EQ(Vector3d(0, 1, 0), v);
+        EXPECT_TRUE(Vector3d(0, 1, 0).Equal(v));
     }
     {
         Vector3d axis(1, 0, 0);
@@ -87,9 +87,9 @@ TEST_F(QuaternionTest, Transform)
         Quat q(axis, Constants::Pi);
         Vector3d v(0, 1, 0);
         v = q.Transform(v);
-        EXPECT_EQ(Vector3d(0, -1, 0), v);
+        EXPECT_TRUE(Vector3d(0, -1, 0).Equal(v));
         v = q.InverseTransform(v);
-        EXPECT_EQ(Vector3d(0, 1, 0), v);
+        EXPECT_TRUE(Vector3d(0, 1, 0).Equal(v));
     }
     {
         Vector3d axis(1, 1, 0);
@@ -97,8 +97,8 @@ TEST_F(QuaternionTest, Transform)
         Quat q(axis, Constants::Pi);
         Vector3d v(1, 0, 0);
         v = q.Transform(v);
-        EXPECT_EQ(Vector3d(0, 1, 0), v);
+        EXPECT_TRUE(Vector3d(0, 1, 0).Equal(v));
         v = q.InverseTransform(v);
-        EXPECT_EQ(Vector3d(1, 0, 0), v);
+        EXPECT_TRUE(Vector3d(1, 0, 0).Equal(v));
     }
 }

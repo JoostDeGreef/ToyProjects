@@ -16,6 +16,12 @@ template<typename E,unsigned int R,unsigned int C> struct is_static_matrix<TMatr
 template<typename T> struct is_dynamic_matrix { static const bool value = false; };
 template<typename E,unsigned int R,unsigned int C> struct is_dynamic_matrix<TMatrix<E,R,C>> { static const bool value = C==0 && R==0; };
 
+template<typename T> struct is_vector { static const bool value = false; };
+template<typename E, unsigned int R, unsigned int C> struct is_vector<TMatrix<E, R, C>> { static const bool value = C==1 || R==1; };
+
+template<typename T> struct is_vector_3D { static const bool value = false; };
+template<typename E, unsigned int R, unsigned int C> struct is_vector_3D<TMatrix<E, R, C>> { static const bool value = (C == 1 && R == 3) || (R == 1 && C == 3); };
+
 #include "Matrix/MatrixFunctions.h"
 #include "Matrix/Matrix.h"
-
+#include "Matrix/Vector.h"

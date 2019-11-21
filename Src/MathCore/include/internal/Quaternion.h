@@ -259,7 +259,7 @@ public:
 
     vector_type InverseTransform(const vector_type& v) const
     {
-        auto res = Inverted() * this_type(0, v[0], v[1], v[2]) * *this;
+        this_type res = Inverted() * this_type(0, v[0], v[1], v[2]) * *this;
         return vector_type(res.GetX(), res.GetY(), res.GetZ());
     }
 };

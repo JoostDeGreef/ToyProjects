@@ -1,3 +1,5 @@
+#pragma once
+
 template<typename ELEMENT, typename MATRIX>
 class TMatrixFunctions
 {
@@ -127,6 +129,23 @@ public:
             res *= base(i, i);
         }
         return res;
+    }
+
+    //
+    // Compare elements
+    //
+    template<typename M, typename std::enable_if<is_matrix<M>::value, int>::type = 0>
+    bool Equal(const M& other) const
+    {
+        base.assert_size(other);
+        for (unsigned int i = 0; i < base.Elements(); ++i)
+        {
+            if (!Numerics::Equal(base(i),other.base(i)))
+            {
+                return false;
+            }
+        }
+        return true;
     }
 
     //
