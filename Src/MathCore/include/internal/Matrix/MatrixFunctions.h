@@ -81,6 +81,15 @@ public:
         return PerformOperator([&value](const Element&) {return value; });
     }
 
+    // 
+    // Fill with random values [min,max)
+    //
+    auto& Random(const Element& minValue,const Element& maxValue)
+    {
+        const Element range = maxValue - minValue;
+        return PerformOperator([&minValue,&range](const Element&) {return minValue + Numerics::NormalizedRandomNumber(range); });
+    }
+    
     //
     // Fill diagonal with one, rest with zero
     //
@@ -529,6 +538,71 @@ public:
         }
         // det = zero? -> singular matrix exception
         return a / det;
+    }
+        
+    //
+    // Swap the contents of two rows
+    //
+    void SwapRows(const unsigned int row0,const unsigned int row1)
+    {
+        unsigned int i0=row0*base.Columns();
+        unsigned int i1=row1*base.Columns();
+        for(unsigned int i=0;i<base.Columns();++i,++i0,++i1)
+        {
+            std::swap(base(i0),base(i1));
+        }
+    }
+    
+    //
+    // Calculate a LUP decomposition
+    //
+    class LUPPacked
+    {
+    publlic:
+        LUPPacked(base)
+            : m_LU(base)
+            , m_P(base.Rows())
+        {
+            base.assert_square();
+            for(unsigned int i=0;i<base.Rows();++i)
+            {
+                P[i] = i;
+            }
+        }
+        
+        void Calculate()
+        {
+            for(unsigned int i=0;i<m_LU.Rows();++i)
+            {
+                pivotRow = FindPivotRow(i);
+                std::swap(m_P(i),m_P(pivotRow));
+                m_LU.SwapRows(i,pivotRow);
+                
+            }
+        }
+    private:
+        Matrix m_LU;
+        std::vector<unsigned int> m_P;
+        
+        // todo: improve pivot selection by taking the value which is largest relative to the other elements in a row
+        unsigned int FindPivotRow(const unsigned int col)
+        {
+            unsigned int pivotRow = col;
+            for(unsigned int i=col+1;i<m_LU.Rows();++i)
+            {
+                if(m_LU(pivotRow,col)<m_LU(i,col))
+                {
+                    pivotRow = i;
+                }
+            }
+            return pivotRow;
+        }
+    }
+    auto LUP()
+    {
+        LUPPacked lup(base);
+        lup.Calculate();
+        return lup;
     }
 };
 

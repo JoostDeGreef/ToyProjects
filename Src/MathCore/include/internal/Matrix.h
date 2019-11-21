@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Numerics.h"
+
 template<typename ELEMENT,unsigned int ROWS,unsigned int COLS> class TMatrix;
 
 template<typename T> struct is_matrix { static const bool value = false; };
