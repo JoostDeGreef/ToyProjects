@@ -8,6 +8,11 @@ public:
     using Matrix = MATRIX;
     using ThisType = TMatrixFunctions<Element, MATRIX>;
 
+    template<typename M> void assert_inner(const M& m) const { assert(base.Columns()==m.Rows()); }
+    template<typename M> void assert_outer(const M& m) const { assert(base.Rows()==m.Columns()); }
+    template<typename M> void assert_size(const M& m) const { assert(base.Rows()==m.Rows() && base.Columns()==m.Columns()); }
+                         void assert_square() const { assert(base.Rows()==base.Columns()); }
+
 protected:
     Matrix& base;
 
@@ -134,7 +139,7 @@ public:
     //
     // Compare elements
     //
-    template<typename M, typename std::enable_if<is_matrix<M>::value, int>::type = 0>
+    template<typename M> //, typename std::enable_if<is_matrix<M>::value, int>::type = 0>
     bool Equal(const M& other) const
     {
         base.assert_size(other);

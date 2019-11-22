@@ -1,7 +1,13 @@
 #pragma once
 
 template<typename VALUE_TYPE, unsigned int ROWS>
-using TVector = TMatrix<VALUE_TYPE, ROWS, 1>;
+using TColumnVector = TMatrix<VALUE_TYPE, ROWS, 1>;
+
+template<typename VALUE_TYPE, unsigned int COLUMNS>
+using TRowVector = TMatrix<VALUE_TYPE, 1, COLUMNS>;
+
+template<typename VALUE_TYPE, unsigned int ROWS>
+using TVector = TColumnVector<VALUE_TYPE, ROWS>;
 
 template<typename VALUE_TYPE>
 using TVector3 = TVector<VALUE_TYPE, 3>;
