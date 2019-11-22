@@ -239,7 +239,7 @@ public:
     inline unsigned int Rows() const { return ROWS; }
     inline unsigned int Dimension() const { return ROWS; }
     inline unsigned int Elements() const { return ROWS; }
-    inline unsigned int Index(const unsigned int row, const unsigned int column) const { assert(row == 0 || column == 0); return row + column; }
+    inline unsigned int Index(const unsigned int row, const unsigned int column) const { return row + column; }
 
     inline Element& operator () (const unsigned int row, const unsigned int column) { return m_data[Index(row, column)]; }
     inline Element operator () (const unsigned int row, const unsigned int column) const { return m_data[Index(row, column)]; }
@@ -273,10 +273,10 @@ public:
     typename std::enable_if<is_vector<V>::value && is_vector<ThisType>::value, ThisType>::type
     OuterProduct(const V& other) const
     {
-        this_type res;
+        ThisType res(*this);
         for (unsigned int i = 0; i < Dimension(); ++i)
         {
-            res[i] = m_data[i] * other[i];
+            res[i] *= other[i];
         }
         return res;
     }
