@@ -1,7 +1,8 @@
-    //
-    // Clear
-    //
-    auto& Clear()
-    {
-        return Fill(Element());
-    }
+//
+// Clear
+//
+template<typename ELEMENT, typename MATRIX>
+auto& TMatrixFunctions<ELEMENT, MATRIX>::Clear()
+{
+    return Fill(Element());
+}
