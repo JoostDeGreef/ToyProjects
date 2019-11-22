@@ -19,96 +19,12 @@ protected:
 public:
     TMatrixFunctions() : base(static_cast<Matrix&>(*this)) {}
 
-    //
-    // Perform logic operator on each element of this
-    //
-    template<typename F>
-    auto PerformLogicOperator(const F& f) const
-    {
-        auto res = base.InstanceLogic();
-        for (unsigned int index = 0; index < base.Elements(); ++index)
-        {
-            res(index) = f(base(index));
-        }
-        return res;
-    }
-    //
-    // Perform logic operator on each element of this and other
-    //
-    template<typename M, typename F, typename std::enable_if<is_matrix<M>::value, int>::type = 0>
-    auto PerformLogicOperator(const M& other, const F& f) const
-    {
-        base.assert_size(other);
-        auto res = base.InstanceLogic();
-        for (unsigned int index = 0; index < base.Elements(); ++index)
-        {
-            res(index) = f(base(index), other.base(index));
-        }
-        return res;
-    }
-    //
-    // Perform operator on each element of this
-    //
-    template<typename F>
-    auto& PerformOperator(const F& f)
-    {
-        for (unsigned int index = 0; index < base.Elements(); ++index)
-        {
-            base(index) = f(base(index));
-        }
-        return base;
-    }
-    //
-    // Perform operator on each element of this and other
-    //
-    template<typename M, typename F, typename std::enable_if<is_matrix<M>::value, int>::type = 0>
-    auto& PerformOperator(const M& other, const F& f)
-    {
-        base.assert_size(other);
-        for (unsigned int index = 0; index < base.Elements(); ++index)
-        {
-            base(index) = f(base(index), other.base(index));
-        }
-        return base;
-    }
-
-    //
-    // Clear
-    //
-    auto& Clear()
-    {
-        return Fill(Element());
-    }
-
-    //
-    // Fill
-    //
-    auto& Fill(const Element& value)
-    {
-        return PerformOperator([&value](const Element&) {return value; });
-    }
-
-    // 
-    // Fill with random values [min,max)
-    //
-    auto& Random(const Element& minValue,const Element& maxValue)
-    {
-        const Element range = maxValue - minValue;
-        return PerformOperator([&minValue,&range](const Element&) {return minValue + Numerics::NormalizedRandomNumber(range); });
-    }
-    
-    //
-    // Fill diagonal with one, rest with zero
-    //
-    auto& Eye()
-    {
-        Clear();
-        for (unsigned int i = 0; i < base.Rows() && i < base.Columns(); ++i)
-        {
-            base(i, i) = Element(1);
-        }
-        return base;
-    }
+#include "MatrixFunctions/PerformLogicOperator.h"
+#include "MatrixFunctions/PerformOperator.h"
+#include "MatrixFunctions/Clear.h"
+#include "MatrixFunctions/Fill.h"
+#include "MatrixFunctions/Random.h"
+#include "MatrixFunctions/Eye.h"
 
     //
     // Extract diagonal as column vector
@@ -139,7 +55,7 @@ public:
     //
     // Compare elements
     //
-    template<typename M> //, typename std::enable_if<is_matrix<M>::value, int>::type = 0>
+    template<typename M, typename std::enable_if<is_matrix<M>::value, int>::type = 0>
     bool Equal(const M& other) const
     {
         base.assert_size(other);
