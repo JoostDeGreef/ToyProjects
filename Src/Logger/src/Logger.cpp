@@ -13,32 +13,12 @@
 #include <atomic>
 
 #include "Logger.h"
+#include "internal/Message.h"
+
+using namespace Logger::Details;
 
 namespace Logger
 {
-    namespace
-    {
-        struct Message
-        {
-            Message()
-                : m_ticks(0)
-                , m_level(Level::Debug)
-                , m_msg()
-            {}
-
-            void Set(const uint64_t ticks, const Level level, std::string&& msg)
-            {
-                m_ticks = ticks;
-                m_level = level;
-                m_msg = std::move(msg);
-            }
-
-            uint64_t m_ticks;
-            Level m_level;
-            std::string m_msg;
-        };
-    }
-
     class LoggerCore
     {
         static const unsigned int buckets = 8;
