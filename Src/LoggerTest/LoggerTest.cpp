@@ -1,5 +1,6 @@
 #include <vector>
 #include <thread>
+#include <chrono>
 #include "gtest/gtest.h"
 #include "Logger.h"
 #include "LoggerSinks.h"
@@ -18,6 +19,38 @@ protected:
   virtual void TearDown()
   {
   }
+};
+
+class BlockedCounterSink final : public Logger::ISink
+{
+public:
+    BlockedCounterSink()
+      : m_count(0)
+      , m_mutex()
+      , m_lock(m_mutex, std::defer_lock)
+    {}
+    void Log(const Logger::Level level,const uint64_t ticks,const std::string & msg) override
+    {
+        m_count++;
+    }
+    void Flush() override
+    {}
+    void Lock()
+    {
+        m_lock.lock();
+    }
+    void Unlock()
+    {
+        m_lock.unlock();
+    }
+    unsigned int Count() const
+    {
+        return m_count;
+    }
+private:
+    unsigned int m_count;
+    std::mutex m_mutex;
+    std::unique_lock<std::mutex> m_lock;
 };
 
 class StoreSink final : public Logger::ISink
@@ -81,23 +114,24 @@ TEST_F(LoggerTest, File)
 
 TEST_F(LoggerTest, AsyncQueue)
 {
-    auto file = boost::filesystem::unique_path();
-    auto logger = Logger::Logger::Instance("File");
+    using namespace std::chrono_literals;
+    auto counter = std::make_shared<BlockedCounterSink>();
+    auto logger = Logger::Logger::Instance("Blocked");
     logger->SetLevel(Logger::Level::Info);
-    logger->AddSink<Logger::Sink::AsyncQueue>(std::make_shared<Logger::Sink::File>(file),256);
-
-    logger->Debug("Is this {}?", "visible");
-    logger->Info("The magic number is {}", 42);
-
+    logger->AddSink<Logger::Sink::AsyncQueue>(counter,16);
+    counter->Lock();
+    
+    for(unsigned int i=0;i<1000;++i)
+    {
+        logger->Info("Logging from a loop: {}", i);
+        std::this_thread::yield();
+    }
+    std::this_thread::sleep_for(2s);
+    counter->Unlock();
     logger.reset();
 
-    std::ifstream f(file.c_str());
-    int n = std::count(std::istreambuf_iterator<char>(f), std::istreambuf_iterator<char>(), '\n');
-    f.close();
-
-    boost::filesystem::remove(file);
-
-    EXPECT_EQ(1, n);
+    EXPECT_GT(1000, counter->Count());
+    EXPECT_LE(8, counter->Count());
 }
 
 TEST_F(LoggerTest, Format)
