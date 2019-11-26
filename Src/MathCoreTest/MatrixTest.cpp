@@ -326,3 +326,15 @@ TEST_F(MatrixTest, LUP)
     EXPECT_EQ(m1(7), m2(7));
     EXPECT_EQ(m1(8), m2(8));
 }
+
+TEST_F(MatrixTest, Solve)
+{
+    auto A = TMatrix<double>(3, 3, { 1, 1, 1,
+                                     0, 2, 5,
+                                     2, 5,-1 });
+    auto b = TMatrix<double,3,1>(6,-4,27);
+    auto x = A.Solve(b);
+    EXPECT_EQ(5, x(0));
+    EXPECT_EQ(3, x(1));
+    EXPECT_EQ(-2, x(2));
+}

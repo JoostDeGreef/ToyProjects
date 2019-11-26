@@ -176,23 +176,35 @@ public:
     //
     class LUPPacked;
     auto LUP();
+    //
+    // Solve A*x = b
+    //
+    template<typename M, typename std::enable_if<is_matrix<M>::value, int>::type = 0> static auto Solve(const LUPPacked & lup,const M& b);
+    template<typename M, typename std::enable_if<is_matrix<M>::value, int>::type = 0>        auto Solve(const M& b) const;
+    //
+    // Write data to stream
+    //
+    std::ostream& to_stream(std::ostream& s) const;
 };
 
+#include "MatrixFunctions/Clear.h"
+#include "MatrixFunctions/Cofactor.h"
+#include "MatrixFunctions/Determinant.h"
+#include "MatrixFunctions/Diag.h"
+#include "MatrixFunctions/Equal.h"
+#include "MatrixFunctions/Eye.h"
+#include "MatrixFunctions/Fill.h"
+#include "MatrixFunctions/Inverse.h"
+#include "MatrixFunctions/LUP.h"
+#include "MatrixFunctions/Minor.h"
+#include "MatrixFunctions/Multiply.h"
 #include "MatrixFunctions/PerformLogicOperator.h"
 #include "MatrixFunctions/PerformOperator.h"
-#include "MatrixFunctions/Clear.h"
-#include "MatrixFunctions/Fill.h"
 #include "MatrixFunctions/Random.h"
-#include "MatrixFunctions/Eye.h"
-#include "MatrixFunctions/Diag.h"
-#include "MatrixFunctions/Trace.h"
-#include "MatrixFunctions/Equal.h"
-#include "MatrixFunctions/Transpose.h"
-#include "MatrixFunctions/Multiply.h"
-#include "MatrixFunctions/Minor.h"
-#include "MatrixFunctions/Determinant.h"
-#include "MatrixFunctions/Cofactor.h"
-#include "MatrixFunctions/Inverse.h"
 #include "MatrixFunctions/SwapRows.h"
-#include "MatrixFunctions/LUP.h"
+#include "MatrixFunctions/Trace.h"
+#include "MatrixFunctions/Transpose.h"
+
+#include "MatrixFunctions/to_stream.h"
+
 

@@ -6,6 +6,7 @@
 #include <initializer_list>
 #include <vector>
 #include <array>
+#include <iostream>
 
 #include "internal/Constants.h"
 #include "internal/Limits.h"

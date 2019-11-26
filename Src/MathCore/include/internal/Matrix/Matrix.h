@@ -7,11 +7,13 @@ public:
     using Element = ELEMENT;
     using ThisType = TMatrix<ELEMENT,ROWS,COLUMNS>;
 
-protected:
-    friend TMatrixFunctions<Element,ThisType>;
+    friend TMatrixFunctions<ELEMENT,ThisType>;
     auto Instance() const { return TMatrix<ELEMENT, ROWS, COLUMNS>(); }
     auto InstanceDiag() const { return TMatrix<ELEMENT, std::min(COLUMNS, ROWS),1>(); }
     auto InstanceTransposed() const { return TMatrix<ELEMENT, COLUMNS, ROWS>(); }
+    template<unsigned int R,unsigned int C>
+    auto InstanceInner(const TMatrix<ELEMENT,R,C>& m) const { return TMatrix<ELEMENT,C,ROWS>(); }
+    auto InstanceInner(const TMatrix<ELEMENT,0,0>& m) const { return TMatrix<ELEMENT,0,0>(m.Columns(), ROWS); }
     template<unsigned int R,unsigned int C>
     auto InstanceOuter(const TMatrix<ELEMENT,R,C>& m) const { return TMatrix<ELEMENT,ROWS,C>(); }
     auto InstanceOuter(const TMatrix<ELEMENT,0,0>& m) const { return TMatrix<ELEMENT,0,0>(ROWS, m.Columns()); }
@@ -75,11 +77,11 @@ public:
     using Element = ELEMENT;
     using ThisType = TMatrix<Element,0,0>;
 
-protected:
-    friend TMatrixFunctions<Element,ThisType>;
+    friend TMatrixFunctions<ELEMENT,ThisType>;
                          auto Instance() const { return ThisType(Rows(), Columns()); }
                          auto InstanceDiag() const { return ThisType(std::min(Columns(),Rows()),1); }
                          auto InstanceTransposed() const { return ThisType(Columns(), Rows()); }
+    template<typename M> auto InstanceInner(const M& m) const { return ThisType(m.Columns(), Rows()); }
     template<typename M> auto InstanceOuter(const M& m) const { return ThisType(Rows(), m.Columns()); }
                          auto InstanceLogic() const { return TMatrix<bool,0,0>(Rows(), Columns()); }
                          auto InstanceMinor() const { return ThisType(Rows()>0?Rows()-1:0,Columns()>0?Columns()-1:0); }
@@ -159,12 +161,14 @@ public:
     using Element = ELEMENT;
     using ThisType = TMatrix<ELEMENT, ROWS, 1>;
 
-protected:
-    friend TVectorFunctions<Element, ThisType>;
-    friend TMatrixFunctions<Element, ThisType>;
+    friend TVectorFunctions<ELEMENT,ThisType>;
+    friend TMatrixFunctions<ELEMENT,ThisType>;
     auto Instance() const { return TMatrix<ELEMENT, ROWS, 1>(); }
     auto InstanceDiag() const { return TMatrix<ELEMENT, 1, 1>(); }
     auto InstanceTransposed() const { return TMatrix<ELEMENT, 1, ROWS>(); }
+    template<unsigned int R, unsigned int C>
+    auto InstanceInner(const TMatrix<ELEMENT, R, C>& m) const { return TMatrix<ELEMENT, C, ROWS>(); }
+    auto InstanceInner(const TMatrix<ELEMENT, 0, 0>& m) const { return TMatrix<ELEMENT, 0, 0>(m.Columns(), ROWS); }
     template<unsigned int R, unsigned int C>
     auto InstanceOuter(const TMatrix<ELEMENT, R, C>& m) const { return TMatrix<ELEMENT, ROWS, C>(); }
     auto InstanceOuter(const TMatrix<ELEMENT, 0, 0>& m) const { return TMatrix<ELEMENT, 0, 0>(ROWS, m.Columns()); }
@@ -249,12 +253,14 @@ public:
     using Element = ELEMENT;
     using ThisType = TMatrix<ELEMENT, 1, COLUMNS>;
 
-protected:
-    friend TVectorFunctions<Element, ThisType>;
-    friend TMatrixFunctions<Element, ThisType>;
+    friend TVectorFunctions<ELEMENT,ThisType>;
+    friend TMatrixFunctions<ELEMENT,ThisType>;
     auto Instance() const { return TMatrix<ELEMENT, 1, COLUMNS>(); }
     auto InstanceDiag() const { return TMatrix<ELEMENT, 1, 1>(); }
     auto InstanceTransposed() const { return TMatrix<ELEMENT, COLUMNS, 1>(); }
+    template<unsigned int R, unsigned int C>
+    auto InstanceInner(const TMatrix<ELEMENT, R, C>& m) const { return TMatrix<ELEMENT, C, 1>(); }
+    auto InstanceInner(const TMatrix<ELEMENT, 0, 0>& m) const { return TMatrix<ELEMENT, 0, 0>(m.Columns(), 1); }
     template<unsigned int R, unsigned int C>
     auto InstanceOuter(const TMatrix<ELEMENT, R, C>& m) const { return TMatrix<ELEMENT, 1, C>(); }
     auto InstanceOuter(const TMatrix<ELEMENT, 0, 0>& m) const { return TMatrix<ELEMENT, 0, 0>(1, m.Columns()); }

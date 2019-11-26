@@ -38,6 +38,10 @@ public:
         }
     }
 
+    const Matrix& LU() const
+    {
+        return m_LU;
+    }
     Matrix L() const
     {
         auto res = m_LU.Instance();
@@ -77,6 +81,11 @@ public:
         }
         return res;
     }
+    
+    const std::vector<unsigned int> & p() const
+    {
+        return m_P;
+    }
 private:
     Matrix m_LU;
     std::vector<unsigned int> m_P;
@@ -103,3 +112,54 @@ auto TMatrixFunctions<ELEMENT, MATRIX>::LUP()
     lup.Calculate();
     return lup;
 }
+
+template<typename ELEMENT, typename MATRIX>
+template<typename M, typename std::enable_if<is_matrix<M>::value, int>::type>
+auto TMatrixFunctions<ELEMENT, MATRIX>::Solve(const M& b) const
+{
+   return Matrix::Solve(base.LUP(),b);
+}
+
+template<typename ELEMENT, typename MATRIX>
+template<typename M, typename std::enable_if<is_matrix<M>::value, int>::type>
+auto TMatrixFunctions<ELEMENT, MATRIX>::Solve(const LUPPacked & lup,const M& b)
+{
+    auto & lu = lup.LU();
+    auto & p = lup.p();
+    lu.assert_inner(b);
+    auto y = b.Instance();
+    for(unsigned int r=0;r<y.Rows();++r)
+    {
+        unsigned int pr = p[r];
+        for(unsigned int c=0;c<y.Columns();++c)
+        {
+            y(r,c) = b(pr,c);
+        }
+    }
+    for(unsigned int r=0;r<y.Rows();++r)
+    {
+        for(unsigned int c=0;c<y.Columns();++c)
+        {
+            Element & e = y(r,c);
+            for(unsigned int i=0;i<r;++i)
+            {
+                e -= y(i,c)*lu(r,i);
+            }
+        }
+    }
+    auto x = y;
+    for(unsigned int r=y.Rows()-1;r<y.Rows();--r)
+    {
+        for(unsigned int c=0;c<x.Columns();++c)
+        {
+            Element & e = x(r,c);
+            for(unsigned int i=r+1;i<y.Rows();++i)
+            {
+                e -= x(i,c)*lu(r,i);
+            }
+            e /= lu(r,r);
+        }
+    }
+    return x;
+}
+
