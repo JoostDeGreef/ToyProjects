@@ -1,5 +1,9 @@
 #pragma once
 
+//
+// Fixed size matrix with arbitrary size for rows/columns
+//
+
 template<typename ELEMENT,unsigned int ROWS = 0,unsigned int COLUMNS = 0>
 class TMatrix : public TMatrixFunctions<ELEMENT, TMatrix<ELEMENT,ROWS,COLUMNS>>
 {
@@ -69,6 +73,10 @@ public:
 private:
     std::array<Element,ROWS*COLUMNS> m_data;
 };
+
+//
+// Dynamically sized matrix
+//
 
 template<typename ELEMENT>
 class TMatrix<ELEMENT,0,0> : public TMatrixFunctions<ELEMENT,TMatrix<ELEMENT,0,0>>
@@ -153,6 +161,10 @@ private:
     unsigned int m_columns;
     unsigned int m_rows;
 };
+
+//
+// Fixed size column vector
+//
 
 template<typename ELEMENT, unsigned int ROWS>
 class TMatrix<ELEMENT, ROWS, 1> : public TVectorFunctions<ELEMENT,TMatrix<ELEMENT, ROWS, 1>>
@@ -245,6 +257,10 @@ public:
 private:
     std::array<Element, ROWS> m_data;
 };
+
+//
+// Fixed size row vector
+//
 
 template<typename ELEMENT, unsigned int COLUMNS>
 class TMatrix<ELEMENT, 1, COLUMNS> : public TVectorFunctions<ELEMENT,TMatrix<ELEMENT, 1, COLUMNS>>
