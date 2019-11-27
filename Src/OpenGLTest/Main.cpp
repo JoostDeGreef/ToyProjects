@@ -3,9 +3,19 @@
 
 #include "Data.h"
 #include "UI.h"
+#include "Logger.h"
+#include "LoggerSinks.h"
 
 int main(int argc, char* argv[])
 {
+    // initialize logging
+    auto logger = Logger::Logger::Instance();
+    logger->SetLevel(Logger::Level::Info);
+    logger->AddSink<Logger::Sink::Console>();
+#ifdef WIN32
+    logger->AddSink<Logger::Sink::WinDebug>();
+#endif // WIN32
+
     // locate the data files and read them
     Data data{ "ToyProjects.00.data","ToyProjects.01.data","ToyProjects.02.data","ToyProjects.03.data",
                "ToyProjects.04.data","ToyProjects.05.data","ToyProjects.06.data","ToyProjects.07.data",

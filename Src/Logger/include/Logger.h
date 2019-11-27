@@ -55,6 +55,8 @@ namespace Logger
         class LoggerCore * m_core;
     };
 
+    using LoggerPtr = std::shared_ptr<Logger>;
+
     template<typename... Args> void Logger::Trace(const char* fmt, Args&& ... args) const
     {
         Log(Level::Trace, fmt, std::forward<Args>(args)...);

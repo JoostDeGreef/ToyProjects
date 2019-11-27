@@ -2,9 +2,9 @@
 #include <unordered_map>
 #include <algorithm>
 
-#include "Logger.h"
 #include "Data.h"
 #include "OpenGL.h"
+#include "Logger.h"
 
 using namespace std;
 using namespace OpenGL;
@@ -13,6 +13,8 @@ namespace
 {
     GLuint LoadShaders(const char* const vertex, const char* const fragment)
     {
+        auto logger = Logger::Logger::Instance();
+
         // Create the shaders
         GLuint vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
         GLuint fragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
@@ -40,7 +42,7 @@ namespace
         auto vertexError = CheckCompilation(vertexShaderID);
         if (!vertexError.empty())
         {
-            // todo: log if error not empty
+            logger->Error(vertexError.c_str());
             return 0;
         }
 
@@ -52,7 +54,7 @@ namespace
         auto fragmentError = CheckCompilation(fragmentShaderID);
         if (!fragmentError.empty())
         {
-            // todo: log if error not empty
+            logger->Error(fragmentError.c_str());
             glDeleteShader(vertexShaderID);
             return 0;
         }
@@ -78,7 +80,7 @@ namespace
         {
             std::vector<char> errorMessage(infoLogLength + 1);
             glGetProgramInfoLog(programID, infoLogLength, NULL, &errorMessage[0]);
-            // todo: log error
+            logger->Error(errorMessage.data());
             glDeleteProgram(programID);
             programID = 0;
         }

@@ -1,4 +1,4 @@
-#include <assert.h>
+#include <cassert>
 #include <algorithm>
 #include <chrono>
 #include <list>
@@ -6,16 +6,18 @@
 #include <string>
 #include <thread>
 #include <vector>
+#include <memory>
 #include <mutex>
 #include <functional>
 #include <iostream>
 #include <deque>
 
-using namespace std;
-using namespace std::chrono_literals;
-
 #include "OpenGL.h"
 #include "UI.h"
+#include "Logger.h"
+
+using namespace std;
+using namespace std::chrono_literals;
 
 class UserInterfaceImp
 {
@@ -52,6 +54,8 @@ private:
     std::unique_ptr<OpenGL::Font> m_font;
 
     Data m_data;
+    Logger::LoggerPtr m_logger;
+
 };
 
 //
@@ -101,6 +105,7 @@ UserInterfaceImp::UserInterfaceImp(Data&& data)
     , m_width(800)
     , m_height(600)
     , m_data(std::move(data))
+    , m_logger(Logger::Logger::Instance())
 {}
 
 bool UserInterfaceImp::Init()
