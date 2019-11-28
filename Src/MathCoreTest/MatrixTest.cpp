@@ -284,7 +284,12 @@ TEST_F(MatrixTest, Determinant)
     EXPECT_EQ(112,TMatrix<int>(4, 4, {1,2,3,4,
                                       5,6,7,8,
                                       9,10,12,11,
-                                      13,14,1,2}).Determinant());    
+                                      13,14,1,2}).Determinant());
+    EXPECT_EQ(117,TMatrix<int>(5, 5, {1, 1, 1, 2,-3,
+                                      0, 2, 5, 1, 1,
+                                      2, 5,-1,-1,-2,
+                                      3,-1, 2, 1, 1,
+                                     -1, 1, 1, 1,-1}).Determinant());
 }
 
 TEST_F(MatrixTest, Inverse)
