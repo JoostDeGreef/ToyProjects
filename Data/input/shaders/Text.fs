@@ -1,4 +1,4 @@
-#version 440
+#version 330
 
 uniform sampler2D texture;
 uniform vec4 inputColor;

@@ -39,8 +39,8 @@ function ProcessFilelist() {
   local BASE=`dirname ${FILELIST}`
   for LINE in `cat ${FILELIST}`
   do
-    local NAME=`echo ${LINE}|cut -d= -f 1|xargs`
-    local FILE=${BASE}/`echo ${LINE}|cut -d= -f 2|xargs`
+    local NAME=`echo -n ${LINE}|cut -d= -f 1|xargs|tr -d "\n\r\'"`
+    local FILE=${BASE}/`echo -n ${LINE}|cut -d= -f 2|xargs|tr -d "\n\r\'"`
     local EXT="${FILE##*.}"
     if [[ -v "ext[${EXT}]" ]]
     then
@@ -125,4 +125,31 @@ EOF
   ProcessDirectoryContents ${DIR} 0
 }
 
+function Verify() {
+    DIR=${1}
+    {
+	for FILE in `find ${DIR} -name *.data`
+	do
+    sqlite3 ${FILE} << EOF
+SELECT '[' || Data.id || ',' || IFNULL(Type.name,'Unknown type') || '] ' || 
+       IFNULL(s5.Name || '/','') || 
+       IFNULL(s4.Name || '/','') || 
+       IFNULL(s3.Name || '/','') || 
+       IFNULL(s2.Name || '/','') || 
+       IFNULL(s1.Name || '/','') || 
+       IFNULL(s0.Name || '/','') || 
+       Data.Name FROM Data
+LEFT JOIN Slot s0 ON s0.id = Data.Slot
+LEFT JOIN Slot s1 ON s1.id = s0.Slot
+LEFT JOIN Slot s2 ON s2.id = s1.Slot
+LEFT JOIN Slot s3 ON s3.id = s2.Slot
+LEFT JOIN Slot s4 ON s4.id = s3.Slot
+LEFT JOIN Slot s5 ON s5.id = s4.Slot
+LEFT JOIN Type ON Data.Type = Type.id
+EOF
+	done
+    } | sort -n -t, -k 1.2
+}
+
 Run "input"
+Verify "processed"
