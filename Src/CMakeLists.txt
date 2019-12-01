@@ -13,4 +13,6 @@ add_subdirectory ("Utils")
 add_subdirectory ("UtilsTest")
 add_subdirectory ("Logger")
 add_subdirectory ("LoggerTest")
+add_subdirectory ("Geometry")
+add_subdirectory ("GeometryTest")
 
