@@ -21,23 +21,23 @@ protected:
         return (p0 - p1).Length();
     }
 
-    void Test(Line2d l0, Line2d l1, Line2d::point_type p, Line2d::Intersection::Type type0, Line2d::Intersection::Type type1, bool isParallel, bool linesIntersect, bool linesSharePoint, bool segmentsIntersect)
+    void Test(Line2d l0, Line2d l1, Line2d::point_type p, Line2d::Intersection::Type pos0, Line2d::Intersection::Type pos1, bool linesParallel, bool linesIntersect, bool segmentsSharePoint, bool segmentsIntersect)
     {
         auto intersection = l0.CalculateIntersection(l1);
-        EXPECT_EQ(isParallel, intersection.IsParallel());
+        EXPECT_EQ(linesParallel, intersection.LinesParallel());
         EXPECT_EQ(linesIntersect, intersection.LinesIntersect());
-        EXPECT_EQ(linesSharePoint, intersection.LinesSharePoint());
+        EXPECT_EQ(segmentsSharePoint, intersection.SegmentsSharePoint());
         EXPECT_EQ(segmentsIntersect, intersection.SegmentsIntersect());
-        EXPECT_EQ(type0, intersection.GetType(0));
-        EXPECT_EQ(type1, intersection.GetType(1));
-        if (!isParallel) EXPECT_EQ(0, distance(p, intersection.GetIntersection()));
+        EXPECT_EQ(pos0, intersection.GetPosition(0));
+        EXPECT_EQ(pos1, intersection.GetPosition(1));
+        if (!linesParallel) EXPECT_EQ(0, distance(p, intersection.GetIntersection()));
     }
 };
 
 
 TEST_F(Line2dTest, Parallel)
 {
-    Test({ { 0,0 },{ 1,0 } }, { { 0,1 },{ 1,1 } }, { 0,0 }, Line2d::Intersection::Parallel, Line2d::Intersection::Parallel, true, false, false, false);
+    Test({ { 0,0 },{ 1,0 } }, { { 0,1 },{ 1,1 } }, { 0,0 }, Line2d::Intersection::Unconnected, Line2d::Intersection::Unconnected, true, false, false, false);
 }
 
 TEST_F(Line2dTest, BeforeBefore)
@@ -64,8 +64,6 @@ TEST_F(Line2dTest, BeforeAfter)
 {
     Test({ { 0,0 },{ 1,0 } }, { {-1,2 },{-1,1 } }, { -1,0 }, Line2d::Intersection::Before, Line2d::Intersection::After, false, true, false, false);
 }
-
-
 
 TEST_F(Line2dTest, StartBefore)
 {
@@ -173,3 +171,11 @@ TEST_F(Line2dTest, AfterAfter)
     Test({ { 0,3 },{ 0,1 } }, { { 2,0 },{ 1,0 } }, { 0,0 }, Line2d::Intersection::After, Line2d::Intersection::After, false, true, false, false);
 }
 
+
+/*
+TEST_F(Line2dTest, Colinear)
+{
+    Test({ { 0,0 },{ 0,1 } }, { { 0,2 },{ 0,3 } }, { 0,0 }, Line2d::Intersection::After, Line2d::Intersection::After, true, false, false, false);
+}
+
+*/

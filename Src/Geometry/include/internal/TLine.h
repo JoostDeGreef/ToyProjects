@@ -5,6 +5,7 @@
 namespace Geometry
 {
     // line segment
+    // common code for 2D and 3D
     template<typename POINT>
     class TLine
     {
@@ -25,42 +26,64 @@ namespace Geometry
         const point_type& GetPoint1() const { return m_p1; }
         const point_type& GetPoint2() const { return m_p2; }
 
+        // parallel && colinear (= lines intersect, segments might intersect)
+        //   ---- ----
+        // parallel
+        //   ----
+        //     ----
+        // !parallel (= lines intersect, segments might intersect)
+        //  --- /
+        //     /
         class Intersection
         {
         public:
-            enum Type
+            enum Type : uint16_t
             {
-                Unknown = 0x00,
+                // Lines not in the same plane
+                Unconnected  = 0x0000,
 
-                Before = 0x01,
-                Start = 0x02,
-                On = 0x04,
-                End = 0x08,
-                After = 0x10,
+                // The lines are intersecting, parallel, or parallel and colinear
+                // only one of these flags should be set
+                Intersecting = 0x1000,
+                Parallel     = 0x2000,
+                Colinear     = 0x4000,
+                
+                // In the case of a plain line intersection, these values
+                // indicate the position of the intersection point on the
+                // respective linesegment.
+                //
+                // In the case of colinear linesegments, these values 
+                // indicate the positions of the first and second points
+                // of the second segment on the first segment
+                Before       = 0x0001,
+                Start        = 0x0002,
+                On           = 0x0004,
+                End          = 0x0008,
+                After        = 0x0010,
 
-                Parallel = 0x20,
-                Colinear = 0x40,
-                Overlapping = 0x80,
             };
 
-            Intersection(const Type type[2], const point_type& intersection, const double s[2])
-                : m_type{ type[0], type[1] }
-                , m_intersection(intersection)
+            Intersection(const uint16_t type[2], const point_type& intersection, const double s[2])
+                : m_intersection(intersection)
                 , m_s{ s[0], s[1] }
+                , m_type{ type[0], type[1] }
             {}
 
-            const Type& GetType(const unsigned int index) const { return m_type[index]; }
+            const uint16_t GetPosition(const unsigned int index = 0) const { return m_type[index] & 0xFF; }
             const point_type& GetIntersection() const { return m_intersection; }
-            // TODO: these are not correct
-            bool IsParallel() const { return Parallel == m_type[0]; } // lines are parallel
-            bool LinesIntersect() const { return Parallel != m_type[0]; } // lines are not parallel
-            bool LinesSharePoint() const { return (m_type[0] & 0x0A) && (m_type[1] & 0x0A); } // end-end, start-start, end-start, start-end
-            bool SegmentsIntersect() const { return (m_type[0] & 0x0E) && (m_type[1] & 0x0E); } // lines intersect within segments
-            const double& s(const unsigned int index) const { return m_s[index]; }
+            
+            bool LinesIntersect() const { return m_type[0] & Intersecting; } // colinear lines are special intersections, treated separately
+            bool LinesParallel() const  { return m_type[0] & Parallel; }     // lines are parallel
+            bool LinesColinear() const  { return m_type[0] & Colinear; }     // lines are colinear
+            
+            bool SegmentsSharePoint() const { return (m_type[0] & (Start|End)) && (m_type[1] & (Start|End)); } // end-end, start-start, end-start, start-end
+            bool SegmentsIntersect() const { return (m_type[0] & (Start|On|End)) && (m_type[1] & (Start|On|End)); } // lines intersect within segments
+            
+            const double& s(const unsigned int index = 0) const { return m_s[index]; }
         private:
-            Type m_type[2];
             point_type m_intersection;
             double m_s[2];
+            uint16_t m_type[2];
         };
 
         Intersection CalculateIntersection(const TLine<POINT>& other, const value_type eps = 0.00001) const;
@@ -75,30 +98,46 @@ namespace Geometry
         point_type slope0 = m_p2 - m_p1;
         point_type slope1 = other.m_p2 - other.m_p1;
         value_type den = slope0[0] * slope1[1] - slope0[1] * slope1[0];
+        auto Interval = [](const value_type& s, const value_type& eps)
+        {
+            if (s + eps < 0)  { return Intersection::Before; }
+            if (s <= eps)     { return Intersection::Start; }
+            if (s + eps < 1)  { return Intersection::On; }
+            if (s <= 1 + eps) { return Intersection::End; }
+                                return Intersection::After;
+        };
         if (den > eps || -den > eps)
         {
             point_type pivot = m_p1 - other.m_p1;
             value_type s = (pivot[1] * slope0[0] - pivot[0] * slope0[1]) / den;
             value_type t = (pivot[1] * slope1[0] - pivot[0] * slope1[1]) / den;
             point_type intersection = ((m_p1 + slope0 * t) + (other.m_p1 + slope1 * s)) * 0.5;
-            auto Interval = [](const value_type& s, const value_type& eps)
-            {
-                if (s + eps < 0) { return 1; }
-                if (s <= eps) { return 2; }
-                if (s + eps < 1) { return 4; }
-                if (s <= 1 + eps) { return 8; }
-                return 16;
-            };
-            const Intersection::Type types[2] = { static_cast<Intersection::Type>(Interval(t, eps * slope0.Length())), static_cast<Intersection::Type>(Interval(s, eps * slope1.Length())) };
-            const value_type st[2] = { t,s };
+            const uint16_t types[2] = { static_cast<uint16_t>(Intersection::Intersecting|Interval(t, eps * slope0.Length())),
+                                        static_cast<uint16_t>(Intersection::Intersecting|Interval(s, eps * slope1.Length())) };
+            const value_type st[2] = { s,t };
             return Intersection(types, intersection, st);
         }
         else
         {
-            // TODO: handle colinear and overlapping
-            const Intersection::Type types[2] = { Intersection::Parallel,Intersection::Parallel };
-            const value_type st[2] = { -1,-1 };
-            return Intersection(types, point_type(), st);
+            point_type slope2 = m_p2 - other.m_p1;
+            den = slope0[0] * slope2[1] - slope0[1] * slope2[0];
+            if (den <= eps && -den <= eps)
+            {
+                // Check if slope0 and slope1 are opposite or not
+                // calculate s and t
+                value_type s = 0;
+                value_type t = 0;
+                const value_type st[2] = { s,t };
+                const uint16_t types[2] = { static_cast<uint16_t>(Intersection::Colinear|Interval(st[0], eps * slope0.Length())),
+                                            static_cast<uint16_t>(Intersection::Colinear|Interval(st[1], eps * slope1.Length())) };
+                return Intersection(types, point_type(), st);
+            }
+            else
+            {
+                const value_type st[2] = { -1,-1 };
+                const uint16_t types[2] = { Intersection::Parallel,Intersection::Parallel };
+                return Intersection(types, point_type(), st);
+            }
         }
     }
 
