@@ -1,6 +1,7 @@
 #pragma once
 
 #include <utility>
+#include <type_traits>
 
 namespace Geometry
 {
@@ -85,61 +86,80 @@ namespace Geometry
             double m_s[2];
             uint16_t m_type[2];
         };
-
-        Intersection CalculateIntersection(const TLine<POINT>& other, const value_type eps = 0.00001) const;
+        
+        Intersection CalculateIntersection(const this_type& other, const value_type eps = 0.00001) const;
     private:
         point_type m_p1;
         point_type m_p2;
     };
 
-    template<typename POINT>
-    inline typename TLine<POINT>::Intersection TLine<POINT>::CalculateIntersection(const TLine<POINT>& other, const value_type eps) const
+    namespace details
     {
-        point_type slope0 = m_p2 - m_p1;
-        point_type slope1 = other.m_p2 - other.m_p1;
-        value_type den = slope0[0] * slope1[1] - slope0[1] * slope1[0];
-        auto Interval = [](const value_type& s, const value_type& eps)
+        template<typename POINT, typename std::enable_if<is_point2d<POINT>::value, int>::type = 0>
+        inline typename TLine<POINT>::Intersection CalculateIntersection(const POINT &l1p1, const POINT &l1p2, const POINT &l2p1, const POINT &l2p2, const typename POINT::Element eps)
         {
-            if (s + eps < 0)  { return Intersection::Before; }
-            if (s <= eps)     { return Intersection::Start; }
-            if (s + eps < 1)  { return Intersection::On; }
-            if (s <= 1 + eps) { return Intersection::End; }
-                                return Intersection::After;
-        };
-        if (den > eps || -den > eps)
-        {
-            point_type pivot = m_p1 - other.m_p1;
-            value_type s = (pivot[1] * slope0[0] - pivot[0] * slope0[1]) / den;
-            value_type t = (pivot[1] * slope1[0] - pivot[0] * slope1[1]) / den;
-            point_type intersection = ((m_p1 + slope0 * t) + (other.m_p1 + slope1 * s)) * 0.5;
-            const uint16_t types[2] = { static_cast<uint16_t>(Intersection::Intersecting|Interval(t, eps * slope0.Length())),
-                                        static_cast<uint16_t>(Intersection::Intersecting|Interval(s, eps * slope1.Length())) };
-            const value_type st[2] = { s,t };
-            return Intersection(types, intersection, st);
-        }
-        else
-        {
-            point_type slope2 = m_p2 - other.m_p1;
-            den = slope0[0] * slope2[1] - slope0[1] * slope2[0];
-            if (den <= eps && -den <= eps)
+            auto slope0 = l1p2 - l1p1;
+            auto slope1 = l2p2 - l2p1;
+            auto den = slope0[0] * slope1[1] - slope0[1] * slope1[0];
+            auto Interval = [](const auto& s, const auto& eps)
             {
-                // Check if slope0 and slope1 are opposite or not
-                // calculate s and t
-                value_type s = 0;
-                value_type t = 0;
-                const value_type st[2] = { s,t };
-                const uint16_t types[2] = { static_cast<uint16_t>(Intersection::Colinear|Interval(st[0], eps * slope0.Length())),
-                                            static_cast<uint16_t>(Intersection::Colinear|Interval(st[1], eps * slope1.Length())) };
-                return Intersection(types, point_type(), st);
+                if (s + eps < 0)  { return TLine<POINT>::Intersection::Before; }
+                if (s <= eps)     { return TLine<POINT>::Intersection::Start; }
+                if (s + eps < 1)  { return TLine<POINT>::Intersection::On; }
+                if (s <= 1 + eps) { return TLine<POINT>::Intersection::End; }
+                                    return TLine<POINT>::Intersection::After;
+            };
+            if (den > eps || -den > eps)
+            {
+                auto pivot = l1p1 - l2p1;
+                auto s = (pivot[1] * slope0[0] - pivot[0] * slope0[1]) / den;
+                auto t = (pivot[1] * slope1[0] - pivot[0] * slope1[1]) / den;
+                auto intersection = ((l1p1 + slope0 * t) + (l2p1 + slope1 * s)) * 0.5;
+                const uint16_t types[2] = { static_cast<uint16_t>(TLine<POINT>::Intersection::Intersecting|Interval(t, eps * slope0.Length())),
+                                            static_cast<uint16_t>(TLine<POINT>::Intersection::Intersecting|Interval(s, eps * slope1.Length())) };
+                const decltype(s) st[2] = { s,t };
+                return typename TLine<POINT>::Intersection(types, intersection, st);
             }
             else
             {
-                const value_type st[2] = { -1,-1 };
-                const uint16_t types[2] = { Intersection::Parallel,Intersection::Parallel };
-                return Intersection(types, point_type(), st);
+                auto slope2 = l1p2 - l2p1;
+                den = slope0[0] * slope2[1] - slope0[1] * slope2[0];
+                if (den <= eps && -den <= eps)
+                {
+                    // TODO:
+                    // - Check if slope0 and slope1 are opposite or not
+                    // - Calculate s and t
+                    auto s = 0.0;
+                    auto t = 0.0;
+                    const decltype(s) st[2] = { s,t };
+                    const uint16_t types[2] = { static_cast<uint16_t>(TLine<POINT>::Intersection::Colinear|Interval(st[0], eps * slope0.Length())),
+                                                static_cast<uint16_t>(TLine<POINT>::Intersection::Colinear|Interval(st[1], eps * slope1.Length())) };
+                    return typename TLine<POINT>::Intersection(types, POINT(), st);
+                }
+                else
+                {
+                    const typename POINT::Element st[2] = { -1,-1 };
+                    const uint16_t types[2] = { TLine<POINT>::Intersection::Parallel,TLine<POINT>::Intersection::Parallel };
+                    return typename TLine<POINT>::Intersection(types, POINT(), st);
+                }
             }
+        }
+        
+        template<typename POINT, typename std::enable_if<is_point3d<POINT>::value, int>::type = 0>
+        inline typename TLine<POINT>::Intersection CalculateIntersection(const POINT &l1p1, const POINT &l1p2, const POINT &l2p1, const POINT &l2p2, const typename POINT::Element eps)
+        {
+            // TODO:
+            // - see if the two lines share a plane.
+            // - map the points to 2d points on the plane.
+            // - calculate intersection
+            // - map calculated 2d points back to 3d space
         }
     }
 
+    template<typename POINT>
+    inline typename TLine<POINT>::Intersection TLine<POINT>::CalculateIntersection(const TLine<POINT>& other, const value_type eps) const
+    {
+        return details::CalculateIntersection(m_p1,m_p2,other.m_p1,other.m_p2,eps);
+    }
 };
 
