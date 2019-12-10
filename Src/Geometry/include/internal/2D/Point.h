@@ -4,6 +4,9 @@
 
 namespace Geometry
 {
-    using Point2d = Vector2d;
+    template<typename T>
+    using Point2 = TVector2<T>;
+    using Point2d = Point2<double>;
+    using Point2f = Point2<float>;
 }
 

@@ -4,6 +4,9 @@
 
 namespace Geometry
 {
-    using Point3d = Vector3d;
+    template<typename T>
+    using Point3 = TVector3<T>;
+    using Point3d = Point3<double>;
+    using Point3f = Point3<float>;
 }
 

@@ -61,7 +61,6 @@ namespace Geometry
                 On           = 0x0004,
                 End          = 0x0008,
                 After        = 0x0010,
-
             };
 
             Intersection(const uint16_t type[2], const point_type& intersection, const double s[2])
@@ -95,7 +94,7 @@ namespace Geometry
 
     namespace details
     {
-        template<typename POINT, typename std::enable_if<is_point2d<POINT>::value, int>::type = 0>
+        template<typename POINT, typename std::enable_if<is_point2<POINT>::value, int>::type = 0>
         inline typename TLine<POINT>::Intersection CalculateIntersection(const POINT &l1p1, const POINT &l1p2, const POINT &l2p1, const POINT &l2p2, const typename POINT::Element eps)
         {
             auto slope0 = l1p2 - l1p1;
@@ -145,14 +144,42 @@ namespace Geometry
             }
         }
         
-        template<typename POINT, typename std::enable_if<is_point3d<POINT>::value, int>::type = 0>
+        template<typename POINT, typename std::enable_if<is_point3<POINT>::value, int>::type = 0>
         inline typename TLine<POINT>::Intersection CalculateIntersection(const POINT &l1p1, const POINT &l1p2, const POINT &l2p1, const POINT &l2p2, const typename POINT::Element eps)
         {
-            // TODO:
+            // Steps:
             // - see if the two lines share a plane.
             // - map the points to 2d points on the plane.
             // - calculate intersection
             // - map calculated 2d points back to 3d space
+            auto v0 = l1p2 - l1p1; // line 1
+            auto v1 = l2p1 - l1p1;
+            auto v2 = l2p2 - l1p1;
+            auto n = CrossProduct(v0, v1).Normalized();
+            auto d = v2.InnerProduct(n);
+            if (d<-eps || d>eps)
+            {
+                const typename POINT::Element st[2] = { -1,-1 };
+                const uint16_t types[2] = { TLine<POINT>::Intersection::Unconnected,TLine<POINT>::Intersection::Unconnected };
+                return typename TLine<POINT>::Intersection(types, POINT(), st);
+            }
+            else
+            {
+                auto v3 = l2p2 - l2p1; // line 2
+                Point2<typename POINT::Element> a(0,0), b(v0.Length(),0), c, d;
+                auto res2d = CalculateIntersection(a, b, c, d, eps);
+                if (res2d.LinesParallel())
+                {
+                    const typename POINT::Element st[2] = { -1,-1 };
+                    const uint16_t types[2] = { TLine<POINT>::Intersection::Parallel,TLine<POINT>::Intersection::Parallel };
+                    return typename TLine<POINT>::Intersection(types, POINT(), st);
+                }
+                else
+                {
+
+                }
+                return res2d;
+            }
         }
     }
 
