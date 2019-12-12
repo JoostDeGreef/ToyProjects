@@ -166,9 +166,16 @@ namespace Geometry
             else
             {
                 auto v3 = l2p2 - l2p1; // line 2
-                Point2<typename POINT::Element> a(0,0), b(v0.Length(),0), c, d;
+                Point2<typename POINT::Element> a(0,0), b(v0.Length(),0), c, d; // todo
                 auto res2d = CalculateIntersection(a, b, c, d, eps);
-                if (res2d.LinesParallel())
+                if (res2d.LinesIntersect())
+                {
+                    // todo
+                    const typename POINT::Element st[2] = { -1,-1 };
+                    const uint16_t types[2] = { TLine<POINT>::Intersection::Parallel,TLine<POINT>::Intersection::Parallel };
+                    return typename TLine<POINT>::Intersection(types, POINT(), st);
+                }
+                else if (res2d.LinesParallel())
                 {
                     const typename POINT::Element st[2] = { -1,-1 };
                     const uint16_t types[2] = { TLine<POINT>::Intersection::Parallel,TLine<POINT>::Intersection::Parallel };
@@ -176,9 +183,12 @@ namespace Geometry
                 }
                 else
                 {
-
+                    assert(res2d.LinesColinear());
+                    // todo
+                    const typename POINT::Element st[2] = { -1,-1 };
+                    const uint16_t types[2] = { TLine<POINT>::Intersection::Parallel,TLine<POINT>::Intersection::Parallel };
+                    return typename TLine<POINT>::Intersection(types, POINT(), st);
                 }
-                return res2d;
             }
         }
     }
