@@ -71,7 +71,10 @@ namespace Geometry
 
             const uint16_t GetPosition(const unsigned int index = 0) const { return m_type[index] & 0xFF; }
             const point_type& GetIntersection() const { return m_intersection; }
-            
+            const value_type& s(const unsigned int index = 0) const { return m_s[index]; }
+            const auto& GetTypes() const { return m_type; }
+            const auto& GetST() const { return m_s; }
+
             bool LinesIntersect() const { return m_type[0] & Intersecting; } // colinear lines are special intersections, treated separately
             bool LinesParallel() const  { return m_type[0] & Parallel; }     // lines are parallel
             bool LinesColinear() const  { return m_type[0] & Colinear; }     // lines are colinear
@@ -79,10 +82,9 @@ namespace Geometry
             bool SegmentsSharePoint() const { return (m_type[0] & (Start|End)) && (m_type[1] & (Start|End)); } // end-end, start-start, end-start, start-end
             bool SegmentsIntersect() const { return (m_type[0] & (Start|On|End)) && (m_type[1] & (Start|On|End)); } // lines intersect within segments
             
-            const double& s(const unsigned int index = 0) const { return m_s[index]; }
         private:
             point_type m_intersection;
-            double m_s[2];
+            value_type m_s[2];
             uint16_t m_type[2];
         };
         
@@ -153,10 +155,23 @@ namespace Geometry
             // - calculate intersection
             // - map calculated 2d points back to 3d space
             auto v0 = l1p2 - l1p1; // line 1
-            auto v1 = l2p1 - l1p1;
+            auto v1 = l2p1 - l1p1; 
             auto v2 = l2p2 - l1p1;
-            auto n = CrossProduct(v0, v1).Normalized();
-            auto d = v2.InnerProduct(n);
+            auto n = CrossProduct(v0, v1);
+            auto m = CrossProduct(v0, v2);
+            auto nl = n.Length();
+            auto ml = m.Length();
+            POINT::Element d;
+            if (nl > ml)
+            {
+                n /= nl;
+                d = v2.InnerProduct(n);
+            }
+            else
+            {
+                n = m / ml;
+                d = v1.InnerProduct(n);
+            }
             if (d<-eps || d>eps)
             {
                 const typename POINT::Element st[2] = { -1,-1 };
@@ -165,29 +180,39 @@ namespace Geometry
             }
             else
             {
-                auto v3 = l2p2 - l2p1; // line 2
-                Point2<typename POINT::Element> a(0,0), b(v0.Length(),0), c, d; // todo
+                auto e0 = v0.Normalized();
+                auto e1 = CrossProduct(e0, n).Normalized();
+                auto Proj = [&e0,&e1](POINT & p)
+                {
+                    auto t0 = e0.InnerProduct(p);
+                    auto t1 = e1.InnerProduct(p);
+                    return Point2<typename POINT::Element>(t0, t1);
+                };
+                Point2<typename POINT::Element> a(0,0), b=Proj(v0), c=Proj(v1), d=Proj(v2);
                 auto res2d = CalculateIntersection(a, b, c, d, eps);
                 if (res2d.LinesIntersect())
                 {
-                    // todo
-                    const typename POINT::Element st[2] = { -1,-1 };
-                    const uint16_t types[2] = { TLine<POINT>::Intersection::Parallel,TLine<POINT>::Intersection::Parallel };
-                    return typename TLine<POINT>::Intersection(types, POINT(), st);
+                    const auto& st = res2d.GetST();
+                    const auto& types = res2d.GetTypes();
+                    auto v3 = l2p2 - l2p1; // line 2
+                    POINT p = (l1p1 + st[1] * v0 + l2p1 + st[0] * v3)/2;
+                    return typename TLine<POINT>::Intersection(types, p, st);
                 }
                 else if (res2d.LinesParallel())
                 {
-                    const typename POINT::Element st[2] = { -1,-1 };
-                    const uint16_t types[2] = { TLine<POINT>::Intersection::Parallel,TLine<POINT>::Intersection::Parallel };
-                    return typename TLine<POINT>::Intersection(types, POINT(), st);
+                    const auto& st = res2d.GetST();
+                    const auto& types = res2d.GetTypes();
+                    return typename TLine<POINT>::Intersection(types, POINT(-1,-1,-1), st);
                 }
                 else
                 {
                     assert(res2d.LinesColinear());
                     // todo
-                    const typename POINT::Element st[2] = { -1,-1 };
-                    const uint16_t types[2] = { TLine<POINT>::Intersection::Parallel,TLine<POINT>::Intersection::Parallel };
-                    return typename TLine<POINT>::Intersection(types, POINT(), st);
+                    const auto& st = res2d.GetST();
+                    const auto& types = res2d.GetTypes();
+                    auto v3 = l2p2 - l2p1; // line 2
+                    POINT p = (l1p1 + st[1] * v0 + l2p1 + st[0] * v3) / 2;
+                    return typename TLine<POINT>::Intersection(types, p, st);
                 }
             }
         }

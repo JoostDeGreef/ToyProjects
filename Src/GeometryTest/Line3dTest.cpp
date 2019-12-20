@@ -30,7 +30,7 @@ protected:
         EXPECT_EQ(segmentsIntersect, intersection.SegmentsIntersect());
         EXPECT_EQ(pos0, intersection.GetPosition(0));
         EXPECT_EQ(pos1, intersection.GetPosition(1));
-        if (!linesParallel) EXPECT_EQ(0, distance(p, intersection.GetIntersection()));
+        if (!linesParallel) EXPECT_EQ(0, distance(p, intersection.GetIntersection())) << p << intersection.GetIntersection();
     }
 };
 

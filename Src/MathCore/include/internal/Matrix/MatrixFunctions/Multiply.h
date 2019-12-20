@@ -17,3 +17,9 @@ auto TMatrixFunctions<ELEMENT, MATRIX>::operator * (const M& other) const
     }
     return res;
 }
+
+template<typename ELEMENT, typename MATRIX, typename std::enable_if<is_matrix<MATRIX>::value, int>::type = 0>
+auto operator * (const ELEMENT& e,const MATRIX& m)
+{
+    return m * e;
+}
